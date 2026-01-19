@@ -1,12 +1,85 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React, { useState } from 'react';
+import Header from '@/components/Header';
+import BottomNav from '@/components/BottomNav';
+import HeroBanner from '@/components/HeroBanner';
+import CategoryFilter from '@/components/CategoryFilter';
+import PizzaCard from '@/components/PizzaCard';
+import PizzaCustomizer from '@/components/PizzaCustomizer';
+import { pizzas, Pizza } from '@/data/menuData';
 
 const Index = () => {
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedPizza, setSelectedPizza] = useState<Pizza | null>(null);
+
+  const filteredPizzas = selectedCategory === 'all' 
+    ? pizzas 
+    : pizzas.filter(p => p.category === selectedCategory);
+
+  // Separate popular pizzas for featured section
+  const popularPizzas = pizzas.filter(p => p.popular);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background pb-24">
+      <Header />
+      
+      <main>
+        <HeroBanner />
+        
+        {/* Popular Section */}
+        {selectedCategory === 'all' && popularPizzas.length > 0 && (
+          <section className="px-4 pt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display font-bold text-xl text-foreground">
+                🔥 Mais Pedidas
+              </h2>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+              {popularPizzas.map((pizza, index) => (
+                <div key={pizza.id} className="min-w-[280px] max-w-[280px]">
+                  <PizzaCard 
+                    pizza={pizza}
+                    onClick={() => setSelectedPizza(pizza)}
+                    index={index}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+        
+        <CategoryFilter 
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
+        
+        {/* Menu Grid */}
+        <section className="px-4 pb-6">
+          <h2 className="font-display font-bold text-xl text-foreground mb-4">
+            {selectedCategory === 'all' ? '📋 Cardápio Completo' : '🍕 ' + selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredPizzas.map((pizza, index) => (
+              <PizzaCard 
+                key={pizza.id}
+                pizza={pizza}
+                onClick={() => setSelectedPizza(pizza)}
+                index={index}
+              />
+            ))}
+          </div>
+        </section>
+      </main>
+      
+      <BottomNav />
+      
+      {/* Pizza Customizer Modal */}
+      {selectedPizza && (
+        <PizzaCustomizer 
+          pizza={selectedPizza}
+          isOpen={!!selectedPizza}
+          onClose={() => setSelectedPizza(null)}
+        />
+      )}
     </div>
   );
 };
