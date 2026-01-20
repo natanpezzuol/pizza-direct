@@ -38,6 +38,7 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
   const [selectedCrust, setSelectedCrust] = useState('tradicional');
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
+  const [notes, setNotes] = useState('');
 
   const image = pizzaImages[pizza.id] || pizzaMargherita;
   
@@ -61,6 +62,7 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
       price: basePrice + crustPrice + extrasPrice,
       quantity,
       image,
+      notes: notes.trim() || undefined,
     });
     onClose();
   };
@@ -234,6 +236,24 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                     );
                   })}
                 </div>
+              </div>
+              
+              {/* Observações */}
+              <div className="mb-6">
+                <h3 className="font-display font-semibold text-foreground mb-3">
+                  Observações
+                </h3>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Ex: Tirar cebola, bem assada, cortar em 8 pedaços..."
+                  maxLength={200}
+                  className="w-full p-4 rounded-xl border-2 border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors resize-none"
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground mt-1 text-right">
+                  {notes.length}/200
+                </p>
               </div>
             </div>
             
