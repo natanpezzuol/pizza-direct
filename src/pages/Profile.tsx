@@ -5,21 +5,23 @@ import { Link, useNavigate } from 'react-router-dom';
 import { usePizzeria } from '@/contexts/PizzeriaContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useNotifications } from '@/contexts/NotificationsContext';
 import BottomNav from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
-
-const menuItems = [
-  { icon: MapPin, label: 'Endereços', path: '/addresses' },
-  { icon: CreditCard, label: 'Formas de Pagamento' },
-  { icon: Bell, label: 'Notificações' },
-  { icon: HelpCircle, label: 'Ajuda e Suporte' },
-];
 
 const Profile = () => {
   const pizzeria = usePizzeria();
   const { user, signOut, loading } = useAuth();
   const { toast } = useToast();
+  const { unreadCount } = useNotifications();
   const navigate = useNavigate();
+
+  const menuItems = [
+    { icon: MapPin, label: 'Endereços', path: '/addresses' },
+    { icon: CreditCard, label: 'Formas de Pagamento' },
+    { icon: Bell, label: 'Notificações', path: '/notifications', badge: unreadCount },
+    { icon: HelpCircle, label: 'Ajuda e Suporte' },
+  ];
 
   const handleSignOut = async () => {
     await signOut();
@@ -139,8 +141,13 @@ const Profile = () => {
                            shadow-card hover:shadow-elevated transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center relative">
                     <item.icon size={20} className="text-foreground" />
+                    {item.badge && item.badge > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+                        {item.badge > 9 ? '9+' : item.badge}
+                      </span>
+                    )}
                   </div>
                   <span className="font-medium text-foreground">{item.label}</span>
                 </div>
