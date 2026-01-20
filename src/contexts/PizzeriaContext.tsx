@@ -10,6 +10,7 @@ interface PizzeriaConfig {
   deliveryTime: string;
   minimumOrder: number;
   deliveryFee: number;
+  primaryColor: string;
 }
 
 const defaultConfig: PizzeriaConfig = {
@@ -22,6 +23,7 @@ const defaultConfig: PizzeriaConfig = {
   deliveryTime: "30-45 min",
   minimumOrder: 30,
   deliveryFee: 5.99,
+  primaryColor: "#E85D04",
 };
 
 const PizzeriaContext = createContext<PizzeriaConfig>(defaultConfig);

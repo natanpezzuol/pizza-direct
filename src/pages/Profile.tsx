@@ -1,9 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, User, MapPin, CreditCard, Bell, HelpCircle, LogOut, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ArrowLeft, User, MapPin, CreditCard, Bell, HelpCircle, LogOut, ChevronRight, LogIn } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { usePizzeria } from '@/contexts/PizzeriaContext';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import BottomNav from '@/components/BottomNav';
+import { Button } from '@/components/ui/button';
 
 const menuItems = [
   { icon: MapPin, label: 'Endereços', badge: '2' },
@@ -14,6 +17,61 @@ const menuItems = [
 
 const Profile = () => {
   const pizzeria = usePizzeria();
+  const { user, signOut, loading } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: 'Até logo!',
+      description: 'Você saiu da sua conta'
+    });
+    navigate('/');
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background pb-24">
+        {/* Header */}
+        <header className="sticky top-0 z-50 glass-card border-b">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center gap-4">
+              <Link to="/" className="p-2 -ml-2 rounded-xl hover:bg-secondary transition-colors">
+                <ArrowLeft size={24} className="text-foreground" />
+              </Link>
+              <h1 className="font-display font-bold text-xl text-foreground">
+                Meu Perfil
+              </h1>
+            </div>
+          </div>
+        </header>
+
+        <div className="px-4 py-6 flex flex-col items-center justify-center min-h-[60vh]">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center"
+          >
+            <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4">
+              <User size={40} className="text-muted-foreground" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground mb-2">Você não está logado</h2>
+            <p className="text-muted-foreground mb-6">Entre ou crie uma conta para acessar seu perfil</p>
+            <Button
+              onClick={() => navigate('/auth')}
+              className="gradient-hero text-primary-foreground"
+            >
+              <LogIn size={20} className="mr-2" />
+              Entrar ou Cadastrar
+            </Button>
+          </motion.div>
+        </div>
+
+        <BottomNav />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -44,10 +102,10 @@ const Profile = () => {
             </div>
             <div>
               <h2 className="font-display font-bold text-xl text-foreground">
-                Cliente
+                {user.user_metadata?.name || 'Cliente'}
               </h2>
               <p className="text-muted-foreground">
-                cliente@email.com
+                {user.email}
               </p>
             </div>
           </div>
@@ -114,6 +172,7 @@ const Profile = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
+          onClick={handleSignOut}
           className="w-full mt-6 flex items-center justify-center gap-2 p-4 rounded-2xl 
                      border-2 border-destructive/20 text-destructive hover:bg-destructive/10 transition-colors"
         >
