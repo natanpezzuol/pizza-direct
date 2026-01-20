@@ -1,16 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Package } from 'lucide-react';
+import { ArrowLeft, Package, MapPin } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import OrderTracker from '@/components/OrderTracker';
 import BottomNav from '@/components/BottomNav';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+
+interface UserAddress {
+  address: string | null;
+  phone: string | null;
+}
 
 const Orders = () => {
   const { user, loading } = useAuth();
+  const [userAddress, setUserAddress] = useState<UserAddress | null>(null);
+  const [loadingAddress, setLoadingAddress] = useState(true);
   
   // Mock order data - in real app, this would come from backend
   const hasActiveOrder = true;
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from('profiles')
+        .select('address, phone')
+        .eq('id', user.id)
+        .single();
+      
+      setUserAddress(data);
+      setLoadingAddress(false);
+    };
+
+    if (user) {
+      fetchAddress();
+    }
+  }, [user]);
 
   // Redirect to auth if not logged in
   if (!loading && !user) {
@@ -82,10 +109,26 @@ const Orders = () => {
               <h3 className="font-display font-semibold text-foreground mb-2">
                 📍 Endereço de Entrega
               </h3>
-              <p className="text-muted-foreground">
-                Rua Exemplo, 123 - Apt 45<br />
-                Centro - São Paulo, SP
-              </p>
+              {loadingAddress ? (
+                <div className="animate-pulse h-12 bg-secondary rounded-xl" />
+              ) : userAddress?.address ? (
+                <div>
+                  <p className="text-foreground">{userAddress.address}</p>
+                  {userAddress.phone && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Tel: {userAddress.phone}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin size={16} />
+                  <span>Endereço não cadastrado</span>
+                  <Link to="/addresses" className="text-primary font-medium hover:underline ml-2">
+                    Cadastrar
+                  </Link>
+                </div>
+              )}
             </section>
           </div>
         ) : (
