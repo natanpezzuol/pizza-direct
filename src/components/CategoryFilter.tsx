@@ -21,15 +21,15 @@ const CategoryFilter = ({ selectedCategory, onSelectCategory }: CategoryFilterPr
               transition={{ delay: index * 0.05 }}
               onClick={() => onSelectCategory(category.id)}
               className={`
-                relative flex items-center gap-2 px-5 py-3 rounded-2xl 
-                whitespace-nowrap font-semibold text-base transition-all
+                relative flex items-center gap-2 px-4 py-2.5 rounded-2xl 
+                whitespace-nowrap font-medium text-sm transition-all
                 ${isActive 
                   ? 'gradient-hero text-primary-foreground shadow-glow' 
                   : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                 }
               `}
             >
-              <span className="text-xl">{category.icon}</span>
+              <span className="text-lg">{category.icon}</span>
               <span>{category.name}</span>
             </motion.button>
           );
