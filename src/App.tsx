@@ -15,6 +15,7 @@ import Search from "./pages/Search";
 import Profile from "./pages/Profile";
 import Addresses from "./pages/Addresses";
 import Notifications from "./pages/Notifications";
+import Checkout from "./pages/Checkout";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -40,6 +41,7 @@ const App = () => (
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/addresses" element={<Addresses />} />
                   <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/checkout" element={<Checkout />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
