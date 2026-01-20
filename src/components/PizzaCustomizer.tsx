@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Check } from 'lucide-react';
 import { Pizza, sizes, crusts, extras } from '@/data/menuData';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-
 // Import pizza images
 import pizzaMargherita from '@/assets/pizza-margherita.jpg';
 import pizzaCalabresa from '@/assets/pizza-calabresa.jpg';
@@ -33,7 +34,9 @@ interface PizzaCustomizerProps {
 }
 
 const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
+  const navigate = useNavigate();
   const { addItem } = useCart();
+  const { user } = useAuth();
   const [selectedSize, setSelectedSize] = useState('medium');
   const [selectedCrust, setSelectedCrust] = useState('tradicional');
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
@@ -52,6 +55,12 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
   const totalPrice = (basePrice + crustPrice + extrasPrice) * quantity;
 
   const handleAddToCart = () => {
+    if (!user) {
+      onClose();
+      navigate('/auth');
+      return;
+    }
+    
     addItem({
       id: '',
       name: pizza.name,
