@@ -103,23 +103,23 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-background rounded-t-3xl z-50 max-h-[90vh] overflow-y-auto"
+            className="fixed bottom-0 left-0 right-0 bg-background rounded-t-2xl sm:rounded-t-3xl z-50 max-h-[85vh] sm:max-h-[90vh] overflow-y-auto"
           >
             {/* Handle */}
-            <div className="sticky top-0 bg-background pt-3 pb-2 z-10">
-              <div className="w-12 h-1.5 bg-muted rounded-full mx-auto" />
+            <div className="sticky top-0 bg-background pt-2 sm:pt-3 pb-1.5 sm:pb-2 z-10">
+              <div className="w-10 sm:w-12 h-1 sm:h-1.5 bg-muted rounded-full mx-auto" />
             </div>
             
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-secondary flex items-center justify-center z-20"
+              className="absolute top-3 sm:top-4 right-3 sm:right-4 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-secondary flex items-center justify-center z-20 active:scale-95"
             >
-              <X size={20} className="text-foreground" />
+              <X size={18} className="sm:w-5 sm:h-5 text-foreground" />
             </button>
             
             {/* Image */}
-            <div className="relative h-48 mx-4 rounded-2xl overflow-hidden">
+            <div className="relative h-36 sm:h-48 mx-3 sm:mx-4 rounded-xl sm:rounded-2xl overflow-hidden">
               <img 
                 src={image} 
                 alt={pizza.name}
@@ -128,18 +128,18 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
             </div>
             
             {/* Content */}
-            <div className="p-4 pb-32">
-              <h2 className="font-display font-bold text-2xl text-foreground mb-2">
+            <div className="p-3 sm:p-4 pb-28 sm:pb-32">
+              <h2 className="font-display font-bold text-xl sm:text-2xl text-foreground mb-1 sm:mb-2">
                 {pizza.name}
               </h2>
-              <p className="text-muted-foreground mb-6">{pizza.description}</p>
+              <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">{pizza.description}</p>
               
               {/* Size Selection */}
-              <div className="mb-6">
-                <h3 className="font-display font-semibold text-foreground mb-3">
+              <div className="mb-4 sm:mb-6">
+                <h3 className="font-display font-semibold text-sm sm:text-base text-foreground mb-2 sm:mb-3">
                   Tamanho
                 </h3>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
                   {sizes.map((size) => {
                     const isSelected = selectedSize === size.id;
                     const price = pizza.prices[size.id as keyof typeof pizza.prices];
@@ -148,7 +148,7 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                         key={size.id}
                         onClick={() => setSelectedSize(size.id)}
                         className={`
-                          relative p-4 rounded-2xl border-2 transition-all
+                          relative p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 transition-all active:scale-[0.98]
                           ${isSelected 
                             ? 'border-primary bg-primary/5' 
                             : 'border-border bg-card hover:border-primary/50'
@@ -156,16 +156,16 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                         `}
                       >
                         {isSelected && (
-                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full gradient-hero flex items-center justify-center">
-                            <Check size={12} className="text-primary-foreground" />
+                          <div className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 w-4 h-4 sm:w-5 sm:h-5 rounded-full gradient-hero flex items-center justify-center">
+                            <Check size={10} className="sm:w-3 sm:h-3 text-primary-foreground" />
                           </div>
                         )}
                         <div className="text-left">
-                          <p className="font-bold text-foreground">{size.name}</p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="font-bold text-sm sm:text-base text-foreground">{size.name}</p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground">
                             {size.slices} • {size.serves}
                           </p>
-                          <p className="font-bold text-primary mt-1">
+                          <p className="font-bold text-primary text-sm sm:text-base mt-0.5 sm:mt-1">
                             R$ {price.toFixed(2)}
                           </p>
                         </div>
@@ -176,11 +176,11 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
               </div>
               
               {/* Crust Selection */}
-              <div className="mb-6">
-                <h3 className="font-display font-semibold text-foreground mb-3">
+              <div className="mb-4 sm:mb-6">
+                <h3 className="font-display font-semibold text-sm sm:text-base text-foreground mb-2 sm:mb-3">
                   Borda
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {crusts.map((crust) => {
                     const isSelected = selectedCrust === crust.id;
                     return (
@@ -188,7 +188,7 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                         key={crust.id}
                         onClick={() => setSelectedCrust(crust.id)}
                         className={`
-                          px-4 py-2.5 rounded-xl font-medium text-sm transition-all
+                          px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium text-xs sm:text-sm transition-all active:scale-95
                           ${isSelected 
                             ? 'gradient-hero text-primary-foreground shadow-glow' 
                             : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
@@ -206,11 +206,11 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
               </div>
               
               {/* Extras */}
-              <div className="mb-6">
-                <h3 className="font-display font-semibold text-foreground mb-3">
+              <div className="mb-4 sm:mb-6">
+                <h3 className="font-display font-semibold text-sm sm:text-base text-foreground mb-2 sm:mb-3">
                   Adicionais
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   {extras.map((extra) => {
                     const isSelected = selectedExtras.includes(extra.id);
                     return (
@@ -218,27 +218,27 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                         key={extra.id}
                         onClick={() => toggleExtra(extra.id)}
                         className={`
-                          w-full flex items-center justify-between p-4 rounded-xl 
-                          border-2 transition-all
+                          w-full flex items-center justify-between p-3 sm:p-4 rounded-lg sm:rounded-xl 
+                          border-2 transition-all active:scale-[0.98]
                           ${isSelected 
                             ? 'border-primary bg-primary/5' 
                             : 'border-border bg-card hover:border-primary/50'
                           }
                         `}
                       >
-                        <span className="font-medium text-foreground">{extra.name}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-primary font-bold">
+                        <span className="font-medium text-sm sm:text-base text-foreground">{extra.name}</span>
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <span className="text-primary font-bold text-sm sm:text-base">
                             +R$ {extra.price.toFixed(2)}
                           </span>
                           <div className={`
-                            w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all
+                            w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all
                             ${isSelected 
                               ? 'gradient-hero border-transparent' 
                               : 'border-border'
                             }
                           `}>
-                            {isSelected && <Check size={14} className="text-primary-foreground" />}
+                            {isSelected && <Check size={12} className="sm:w-3.5 sm:h-3.5 text-primary-foreground" />}
                           </div>
                         </div>
                       </button>
@@ -248,50 +248,50 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
               </div>
               
               {/* Observações */}
-              <div className="mb-6">
-                <h3 className="font-display font-semibold text-foreground mb-3">
+              <div className="mb-4 sm:mb-6">
+                <h3 className="font-display font-semibold text-sm sm:text-base text-foreground mb-2 sm:mb-3">
                   Observações
                 </h3>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Ex: Tirar cebola, bem assada, cortar em 8 pedaços..."
+                  placeholder="Ex: Tirar cebola, bem assada..."
                   maxLength={200}
-                  className="w-full p-4 rounded-xl border-2 border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors resize-none"
-                  rows={3}
+                  className="w-full p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 border-border bg-card text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors resize-none"
+                  rows={2}
                 />
-                <p className="text-xs text-muted-foreground mt-1 text-right">
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 text-right">
                   {notes.length}/200
                 </p>
               </div>
             </div>
             
             {/* Footer */}
-            <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 safe-area-bottom">
-              <div className="flex items-center gap-4">
+            <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-3 sm:p-4 safe-area-bottom">
+              <div className="flex items-center gap-2 sm:gap-4">
                 {/* Quantity */}
-                <div className="flex items-center gap-3 bg-secondary rounded-xl p-1">
+                <div className="flex items-center gap-2 sm:gap-3 bg-secondary rounded-lg sm:rounded-xl p-0.5 sm:p-1">
                   <button
                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                    className="w-10 h-10 rounded-lg bg-background flex items-center justify-center"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-md sm:rounded-lg bg-background flex items-center justify-center active:scale-95"
                   >
-                    <Minus size={18} className="text-foreground" />
+                    <Minus size={16} className="sm:w-[18px] sm:h-[18px] text-foreground" />
                   </button>
-                  <span className="w-8 text-center font-bold text-foreground">
+                  <span className="w-6 sm:w-8 text-center font-bold text-sm sm:text-base text-foreground">
                     {quantity}
                   </span>
                   <button
                     onClick={() => setQuantity(q => q + 1)}
-                    className="w-10 h-10 rounded-lg bg-background flex items-center justify-center"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-md sm:rounded-lg bg-background flex items-center justify-center active:scale-95"
                   >
-                    <Plus size={18} className="text-foreground" />
+                    <Plus size={16} className="sm:w-[18px] sm:h-[18px] text-foreground" />
                   </button>
                 </div>
                 
                 {/* Add Button */}
                 <Button
                   onClick={handleAddToCart}
-                  className="flex-1 h-12 gradient-hero text-primary-foreground font-bold text-base rounded-xl shadow-glow"
+                  className="flex-1 h-10 sm:h-12 gradient-hero text-primary-foreground font-bold text-sm sm:text-base rounded-lg sm:rounded-xl shadow-glow active:scale-[0.98]"
                 >
                   Adicionar • R$ {totalPrice.toFixed(2)}
                 </Button>
