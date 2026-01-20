@@ -19,7 +19,7 @@ const Index = () => {
   const popularPizzas = pizzas.filter(p => p.popular);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-20 sm:pb-24">
       <Header />
       
       <main>
@@ -27,15 +27,15 @@ const Index = () => {
         
         {/* Popular Section */}
         {selectedCategory === 'all' && popularPizzas.length > 0 && (
-          <section className="px-4 pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-bold text-xl text-foreground">
+          <section className="px-3 sm:px-4 pt-4 sm:pt-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h2 className="font-display font-bold text-lg sm:text-xl text-foreground">
                 🔥 Mais Pedidas
               </h2>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide -mx-3 sm:-mx-4 px-3 sm:px-4">
               {popularPizzas.map((pizza, index) => (
-                <div key={pizza.id} className="min-w-[280px] max-w-[280px]">
+                <div key={pizza.id} className="min-w-[220px] max-w-[220px] sm:min-w-[280px] sm:max-w-[280px]">
                   <PizzaCard 
                     pizza={pizza}
                     onClick={() => setSelectedPizza(pizza)}
@@ -53,11 +53,11 @@ const Index = () => {
         />
         
         {/* Menu Grid */}
-        <section className="px-4 pb-6">
-          <h2 className="font-display font-bold text-xl text-foreground mb-4">
+        <section className="px-3 sm:px-4 pb-4 sm:pb-6">
+          <h2 className="font-display font-bold text-lg sm:text-xl text-foreground mb-3 sm:mb-4">
             {selectedCategory === 'all' ? '📋 Cardápio Completo' : '🍕 ' + selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
             {filteredPizzas.map((pizza, index) => (
               <PizzaCard 
                 key={pizza.id}
