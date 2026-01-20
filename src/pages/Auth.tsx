@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Pizza, Mail, Lock, User, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -25,8 +25,21 @@ const signupSchema = z.object({
   path: ['confirmPassword']
 });
 
+const resetPasswordSchema = z.object({
+  password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'As senhas não coincidem',
+  path: ['confirmPassword']
+});
+
+type AuthMode = 'login' | 'signup' | 'forgot' | 'reset';
+
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [searchParams] = useSearchParams();
+  const modeFromUrl = searchParams.get('mode');
+  
+  const [mode, setMode] = useState<AuthMode>(modeFromUrl === 'reset' ? 'reset' : 'login');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -39,21 +52,31 @@ const Auth = () => {
 
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, loading, signIn, signUp } = useAuth();
+  const { user, loading, signIn, signUp, resetPassword, updatePassword } = useAuth();
   const pizzeria = usePizzeria();
 
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && user && mode !== 'reset') {
       navigate('/');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, mode]);
+
+  useEffect(() => {
+    if (modeFromUrl === 'reset') {
+      setMode('reset');
+    }
+  }, [modeFromUrl]);
 
   const validateForm = () => {
     try {
-      if (isLogin) {
+      if (mode === 'login') {
         loginSchema.parse({ email: formData.email, password: formData.password });
-      } else {
+      } else if (mode === 'signup') {
         signupSchema.parse(formData);
+      } else if (mode === 'forgot') {
+        z.string().email('Email inválido').parse(formData.email);
+      } else if (mode === 'reset') {
+        resetPasswordSchema.parse({ password: formData.password, confirmPassword: formData.confirmPassword });
       }
       setErrors({});
       return true;
@@ -63,6 +86,8 @@ const Auth = () => {
         error.errors.forEach((err) => {
           if (err.path[0]) {
             newErrors[err.path[0] as string] = err.message;
+          } else {
+            newErrors['email'] = err.message;
           }
         });
         setErrors(newErrors);
@@ -79,7 +104,7 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      if (isLogin) {
+      if (mode === 'login') {
         const { error } = await signIn(formData.email, formData.password);
         
         if (error) {
@@ -104,7 +129,7 @@ const Auth = () => {
           description: 'Login realizado com sucesso'
         });
         navigate('/');
-      } else {
+      } else if (mode === 'signup') {
         const { error } = await signUp(formData.email, formData.password, formData.name);
         
         if (error) {
@@ -128,6 +153,40 @@ const Auth = () => {
           title: 'Conta criada!',
           description: 'Verifique seu email para confirmar o cadastro'
         });
+      } else if (mode === 'forgot') {
+        const { error } = await resetPassword(formData.email);
+        
+        if (error) {
+          toast({
+            title: 'Erro',
+            description: error.message,
+            variant: 'destructive'
+          });
+          return;
+        }
+
+        toast({
+          title: 'Email enviado!',
+          description: 'Verifique sua caixa de entrada para redefinir a senha'
+        });
+        setMode('login');
+      } else if (mode === 'reset') {
+        const { error } = await updatePassword(formData.password);
+        
+        if (error) {
+          toast({
+            title: 'Erro',
+            description: error.message,
+            variant: 'destructive'
+          });
+          return;
+        }
+
+        toast({
+          title: 'Senha alterada!',
+          description: 'Sua senha foi atualizada com sucesso'
+        });
+        navigate('/');
       }
     } finally {
       setIsLoading(false);
@@ -139,6 +198,12 @@ const Auth = () => {
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
+  };
+
+  const switchMode = (newMode: AuthMode) => {
+    setMode(newMode);
+    setErrors({});
+    setFormData({ name: '', email: '', password: '', confirmPassword: '' });
   };
 
   if (loading) {
@@ -154,6 +219,24 @@ const Auth = () => {
     );
   }
 
+  const getTitle = () => {
+    switch (mode) {
+      case 'login': return 'Entre na sua conta';
+      case 'signup': return 'Crie sua conta';
+      case 'forgot': return 'Recuperar senha';
+      case 'reset': return 'Nova senha';
+    }
+  };
+
+  const getButtonText = () => {
+    switch (mode) {
+      case 'login': return 'Entrar';
+      case 'signup': return 'Criar conta';
+      case 'forgot': return 'Enviar email';
+      case 'reset': return 'Alterar senha';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col">
       {/* Header */}
@@ -161,7 +244,7 @@ const Auth = () => {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate('/')}
+          onClick={() => mode === 'forgot' ? switchMode('login') : navigate('/')}
           className="text-muted-foreground"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -183,9 +266,7 @@ const Auth = () => {
             <Pizza className="w-10 h-10" style={{ color: pizzeria.primaryColor }} />
           </div>
           <h1 className="text-2xl font-bold text-foreground">{pizzeria.name}</h1>
-          <p className="text-muted-foreground mt-1">
-            {isLogin ? 'Entre na sua conta' : 'Crie sua conta'}
-          </p>
+          <p className="text-muted-foreground mt-1">{getTitle()}</p>
         </motion.div>
 
         <motion.form
@@ -195,7 +276,7 @@ const Auth = () => {
           onSubmit={handleSubmit}
           className="w-full max-w-sm space-y-4"
         >
-          {!isLogin && (
+          {mode === 'signup' && (
             <div className="space-y-2">
               <Label htmlFor="name">Nome</Label>
               <div className="relative">
@@ -215,50 +296,54 @@ const Auth = () => {
             </div>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                className={`pl-10 ${errors.email ? 'border-destructive' : ''}`}
-              />
+          {(mode === 'login' || mode === 'signup' || mode === 'forgot') && (
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  className={`pl-10 ${errors.email ? 'border-destructive' : ''}`}
+                />
+              </div>
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email}</p>
+              )}
             </div>
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email}</p>
-            )}
-          </div>
+          )}
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
-                className={`pl-10 pr-10 ${errors.password ? 'border-destructive' : ''}`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
+          {(mode === 'login' || mode === 'signup' || mode === 'reset') && (
+            <div className="space-y-2">
+              <Label htmlFor="password">{mode === 'reset' ? 'Nova Senha' : 'Senha'}</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  className={`pl-10 pr-10 ${errors.password ? 'border-destructive' : ''}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-sm text-destructive">{errors.password}</p>
+              )}
             </div>
-            {errors.password && (
-              <p className="text-sm text-destructive">{errors.password}</p>
-            )}
-          </div>
+          )}
 
-          {!isLogin && (
+          {(mode === 'signup' || mode === 'reset') && (
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirmar Senha</Label>
               <div className="relative">
@@ -278,6 +363,25 @@ const Auth = () => {
             </div>
           )}
 
+          {mode === 'login' && (
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => switchMode('forgot')}
+                className="text-sm hover:underline"
+                style={{ color: pizzeria.primaryColor }}
+              >
+                Esqueceu a senha?
+              </button>
+            </div>
+          )}
+
+          {mode === 'forgot' && (
+            <p className="text-sm text-muted-foreground text-center">
+              Digite seu email e enviaremos um link para redefinir sua senha.
+            </p>
+          )}
+
           <Button
             type="submit"
             className="w-full h-12 text-lg font-semibold"
@@ -292,33 +396,49 @@ const Auth = () => {
                 <Pizza className="w-5 h-5" />
               </motion.div>
             ) : (
-              isLogin ? 'Entrar' : 'Criar conta'
+              getButtonText()
             )}
           </Button>
         </motion.form>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="mt-6 text-center"
-        >
-          <p className="text-muted-foreground">
-            {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setErrors({});
-              setFormData({ name: '', email: '', password: '', confirmPassword: '' });
-            }}
-            className="font-semibold hover:underline"
-            style={{ color: pizzeria.primaryColor }}
+        {(mode === 'login' || mode === 'signup') && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="mt-6 text-center"
           >
-            {isLogin ? 'Criar conta' : 'Fazer login'}
-          </button>
-        </motion.div>
+            <p className="text-muted-foreground">
+              {mode === 'login' ? 'Não tem uma conta?' : 'Já tem uma conta?'}
+            </p>
+            <button
+              type="button"
+              onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
+              className="font-semibold hover:underline"
+              style={{ color: pizzeria.primaryColor }}
+            >
+              {mode === 'login' ? 'Criar conta' : 'Fazer login'}
+            </button>
+          </motion.div>
+        )}
+
+        {mode === 'forgot' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="mt-6 text-center"
+          >
+            <button
+              type="button"
+              onClick={() => switchMode('login')}
+              className="font-semibold hover:underline"
+              style={{ color: pizzeria.primaryColor }}
+            >
+              Voltar para login
+            </button>
+          </motion.div>
+        )}
       </div>
     </div>
   );
