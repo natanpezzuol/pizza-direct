@@ -7,14 +7,18 @@ import BottomNav from '@/components/BottomNav';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
-interface UserAddress {
-  address: string | null;
-  phone: string | null;
+interface ParsedAddress {
+  cep?: string;
+  street?: string;
+  city?: string;
+  number?: string;
+  complement?: string;
+  phone?: string;
 }
 
 const Orders = () => {
   const { user, loading } = useAuth();
-  const [userAddress, setUserAddress] = useState<UserAddress | null>(null);
+  const [parsedAddress, setParsedAddress] = useState<ParsedAddress | null>(null);
   const [loadingAddress, setLoadingAddress] = useState(true);
   
   // Mock order data - in real app, this would come from backend
@@ -28,9 +32,21 @@ const Orders = () => {
         .from('profiles')
         .select('address, phone')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
       
-      setUserAddress(data);
+      if (data?.address) {
+        try {
+          const parsed = JSON.parse(data.address);
+          setParsedAddress({
+            ...parsed,
+            phone: data.phone || parsed.phone,
+          });
+        } catch {
+          setParsedAddress(null);
+        }
+      } else {
+        setParsedAddress(null);
+      }
       setLoadingAddress(false);
     };
 
@@ -111,12 +127,18 @@ const Orders = () => {
               </h3>
               {loadingAddress ? (
                 <div className="animate-pulse h-12 bg-secondary rounded-xl" />
-              ) : userAddress?.address ? (
-                <div>
-                  <p className="text-foreground">{userAddress.address}</p>
-                  {userAddress.phone && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Tel: {userAddress.phone}
+              ) : parsedAddress?.street ? (
+                <div className="space-y-1">
+                  <p className="text-foreground font-medium">
+                    {parsedAddress.street}, {parsedAddress.number}
+                    {parsedAddress.complement && ` - ${parsedAddress.complement}`}
+                  </p>
+                  <p className="text-muted-foreground">
+                    {parsedAddress.city}
+                  </p>
+                  {parsedAddress.phone && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      📞 {parsedAddress.phone}
                     </p>
                   )}
                 </div>
