@@ -1,13 +1,29 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Package } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import OrderTracker from '@/components/OrderTracker';
 import BottomNav from '@/components/BottomNav';
+import { useAuth } from '@/hooks/useAuth';
 
 const Orders = () => {
+  const { user, loading } = useAuth();
+  
   // Mock order data - in real app, this would come from backend
   const hasActiveOrder = true;
+
+  // Redirect to auth if not logged in
+  if (!loading && !user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-24">
