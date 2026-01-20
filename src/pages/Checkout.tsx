@@ -21,14 +21,20 @@ interface Address {
   phone: string;
 }
 
-type PaymentMethod = 'card' | 'pix';
+type PaymentMethod = 'credit_online' | 'card_delivery' | 'pix';
 
 const paymentOptions = [
   {
-    id: 'card' as PaymentMethod,
-    name: 'Cartão de Crédito ou Débito',
-    description: 'Pagamento na entrega com maquininha',
+    id: 'credit_online' as PaymentMethod,
+    name: 'Cartão de Crédito',
+    description: 'Pagamento online com cartão de crédito',
     icon: CreditCard,
+  },
+  {
+    id: 'card_delivery' as PaymentMethod,
+    name: 'Cartão de Crédito ou Débito na Entrega',
+    description: 'Pagamento na entrega com maquininha',
+    icon: Smartphone,
   },
   {
     id: 'pix' as PaymentMethod,
