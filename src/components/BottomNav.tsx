@@ -3,16 +3,18 @@ import { Home, Search, ClipboardList, User, ShoppingCart } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useCart } from '@/contexts/CartContext';
-
-const navItems = [
-  { icon: Home, label: 'Início', path: '/' },
-  { icon: Search, label: 'Buscar', path: '/search' },
-  { icon: ClipboardList, label: 'Pedidos', path: '/orders' },
-  { icon: User, label: 'Perfil', path: '/profile' },
-];
+import { useAuth } from '@/hooks/useAuth';
 
 const BottomNav = () => {
   const location = useLocation();
+  const { user } = useAuth();
+
+  const navItems = [
+    { icon: Home, label: 'Início', path: '/' },
+    { icon: Search, label: 'Buscar', path: '/search' },
+    ...(user ? [{ icon: ClipboardList, label: 'Pedidos', path: '/orders' }] : []),
+    { icon: User, label: 'Perfil', path: '/profile' },
+  ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t safe-area-bottom">
