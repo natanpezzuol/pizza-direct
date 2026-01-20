@@ -45,6 +45,11 @@ const CartItemComponent = ({ item, index }: CartItemProps) => {
                   +{item.extras.join(', ')}
                 </p>
               )}
+              {item.notes && (
+                <p className="text-xs text-muted-foreground mt-1 italic">
+                  Obs: {item.notes}
+                </p>
+              )}
             </div>
             
             <button
