@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Trash2, ShoppingBag, MapPin, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Trash2, ShoppingBag, MapPin, ChevronRight, Check, Home, Briefcase, Heart } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { usePizzeria } from '@/contexts/PizzeriaContext';
@@ -9,46 +9,73 @@ import { supabase } from '@/integrations/supabase/client';
 import CartItemComponent from '@/components/CartItem';
 import BottomNav from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
-interface AddressData {
+interface Address {
+  id: string;
+  label: string;
   cep: string;
   street: string;
   city: string;
   number: string;
-  complement?: string;
+  complement: string | null;
   phone: string;
+  is_default: boolean;
 }
+
+const labelIcons = {
+  'Casa': Home,
+  'Trabalho': Briefcase,
+  'Outro': Heart,
+} as const;
 
 const Cart = () => {
   const { items, totalPrice, clearCart } = useCart();
   const pizzeria = usePizzeria();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [savedAddress, setSavedAddress] = useState<AddressData | null>(null);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
-      fetchAddress();
+      fetchAddresses();
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
-  const fetchAddress = async () => {
+  const fetchAddresses = async () => {
     if (!user) return;
 
     const { data } = await supabase
-      .from('profiles')
-      .select('address')
-      .eq('id', user.id)
-      .maybeSingle();
+      .from('addresses')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('is_default', { ascending: false })
+      .order('created_at', { ascending: false });
 
-    if (data?.address) {
-      try {
-        const parsed = JSON.parse(data.address);
-        setSavedAddress(parsed);
-      } catch {
-        setSavedAddress(null);
-      }
+    if (data && data.length > 0) {
+      setAddresses(data);
+      // Select default address or first one
+      const defaultAddress = data.find(a => a.is_default) || data[0];
+      setSelectedAddressId(defaultAddress.id);
     }
+    setLoading(false);
+  };
+
+  const selectedAddress = addresses.find(a => a.id === selectedAddressId);
+
+  const handleSelectAddress = (addressId: string) => {
+    setSelectedAddressId(addressId);
+    setIsAddressDialogOpen(false);
   };
 
   const subtotal = totalPrice;
@@ -56,6 +83,10 @@ const Cart = () => {
   const total = subtotal + deliveryFee;
 
   const handleCheckout = () => {
+    if (!selectedAddress) {
+      setIsAddressDialogOpen(true);
+      return;
+    }
     // Navigate to order tracking (simulating order placement)
     navigate('/orders');
   };
@@ -136,27 +167,33 @@ const Cart = () => {
 
       {/* Delivery Address */}
       <div className="px-4 py-2">
-        <Link to="/addresses">
-          <div className="bg-card rounded-2xl p-4 shadow-card flex items-center justify-between hover:shadow-elevated transition-all">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <MapPin size={20} className="text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Entregar em</p>
-                {savedAddress ? (
-                  <p className="font-medium text-foreground">
-                    {savedAddress.street}, {savedAddress.number}
-                    {savedAddress.complement && ` - ${savedAddress.complement}`}
-                  </p>
-                ) : (
-                  <p className="font-medium text-primary">Adicionar endereço</p>
-                )}
-              </div>
+        <button
+          onClick={() => addresses.length > 0 ? setIsAddressDialogOpen(true) : navigate('/addresses')}
+          className="w-full bg-card rounded-2xl p-4 shadow-card flex items-center justify-between hover:shadow-elevated transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <MapPin size={20} className="text-primary" />
             </div>
-            <ChevronRight size={20} className="text-muted-foreground" />
+            <div className="text-left">
+              <p className="text-sm text-muted-foreground">Entregar em</p>
+              {loading ? (
+                <div className="animate-pulse h-5 w-40 bg-secondary rounded" />
+              ) : selectedAddress ? (
+                <div>
+                  <p className="font-medium text-foreground">
+                    {selectedAddress.street}, {selectedAddress.number}
+                    {selectedAddress.complement && ` - ${selectedAddress.complement}`}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{selectedAddress.city}</p>
+                </div>
+              ) : (
+                <p className="font-medium text-primary">Adicionar endereço</p>
+              )}
+            </div>
           </div>
-        </Link>
+          <ChevronRight size={20} className="text-muted-foreground" />
+        </button>
       </div>
 
       {/* Summary */}
@@ -187,6 +224,93 @@ const Cart = () => {
           Finalizar Pedido • R$ {total.toFixed(2)}
         </Button>
       </div>
+
+      {/* Address Selection Dialog */}
+      <Dialog open={isAddressDialogOpen} onOpenChange={setIsAddressDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Escolha o endereço de entrega</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-4">
+            {addresses.length === 0 ? (
+              <div className="text-center py-8">
+                <MapPin size={48} className="text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4">Nenhum endereço cadastrado</p>
+                <Button
+                  onClick={() => {
+                    setIsAddressDialogOpen(false);
+                    navigate('/addresses');
+                  }}
+                  className="gradient-hero text-primary-foreground"
+                >
+                  Adicionar Endereço
+                </Button>
+              </div>
+            ) : (
+              <>
+                <AnimatePresence>
+                  {addresses.map((address, index) => {
+                    const LabelIcon = labelIcons[address.label] || Home;
+                    const isSelected = selectedAddressId === address.id;
+                    return (
+                      <motion.button
+                        key={address.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        onClick={() => handleSelectAddress(address.id)}
+                        className={`w-full p-4 rounded-2xl border-2 transition-all text-left ${
+                          isSelected
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                            isSelected ? 'bg-primary/10' : 'bg-secondary'
+                          }`}>
+                            <LabelIcon size={20} className={isSelected ? 'text-primary' : 'text-muted-foreground'} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-bold text-foreground">{address.label}</span>
+                              {address.is_default && (
+                                <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                                  Padrão
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-foreground">
+                              {address.street}, {address.number}
+                              {address.complement && ` - ${address.complement}`}
+                            </p>
+                            <p className="text-sm text-muted-foreground">{address.city}</p>
+                          </div>
+                          {isSelected && (
+                            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                              <Check size={14} className="text-primary-foreground" />
+                            </div>
+                          )}
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+                </AnimatePresence>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddressDialogOpen(false);
+                    navigate('/addresses');
+                  }}
+                  className="w-full mt-2"
+                >
+                  Gerenciar Endereços
+                </Button>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <BottomNav />
     </div>
