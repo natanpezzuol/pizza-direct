@@ -59,13 +59,12 @@ const Index = () => {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredPizzas.map((pizza, index) => (
-              <div key={pizza.id} className="min-w-[280px] max-w-[280px] mx-auto sm:mx-0 sm:max-w-none">
-                <PizzaCard 
-                  pizza={pizza}
-                  onClick={() => setSelectedPizza(pizza)}
-                  index={index}
-                />
-              </div>
+              <PizzaCard 
+                key={pizza.id}
+                pizza={pizza}
+                onClick={() => setSelectedPizza(pizza)}
+                index={index}
+              />
             ))}
           </div>
         </section>
