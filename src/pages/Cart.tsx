@@ -87,8 +87,8 @@ const Cart = () => {
       setIsAddressDialogOpen(true);
       return;
     }
-    // Navigate to order tracking (simulating order placement)
-    navigate('/orders');
+    // Navigate to checkout page
+    navigate('/checkout');
   };
 
   if (items.length === 0) {
