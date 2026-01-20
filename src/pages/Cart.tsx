@@ -87,8 +87,8 @@ const Cart = () => {
       setIsAddressDialogOpen(true);
       return;
     }
-    // Navigate to checkout page
-    navigate('/checkout');
+    // Navigate to checkout page with selected address
+    navigate('/checkout', { state: { addressId: selectedAddressId } });
   };
 
   if (items.length === 0) {

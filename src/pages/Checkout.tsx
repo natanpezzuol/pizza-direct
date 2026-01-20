@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CreditCard, Smartphone, QrCode, Check } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { usePizzeria } from '@/contexts/PizzeriaContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -51,10 +51,14 @@ const Checkout = () => {
   const { toast } = useToast();
   const { addNotification } = useNotifications();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const [selectedPayment, setSelectedPayment] = useState<PaymentMethod | null>(null);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Get address ID from cart navigation state
+  const addressIdFromCart = (location.state as { addressId?: string })?.addressId;
 
   const subtotal = totalPrice;
   const deliveryFee = pizzeria.deliveryFee;
@@ -67,13 +71,29 @@ const Checkout = () => {
     }
     
     if (user) {
-      fetchDefaultAddress();
+      fetchAddress();
     }
-  }, [user, items]);
+  }, [user, items, addressIdFromCart]);
 
-  const fetchDefaultAddress = async () => {
+  const fetchAddress = async () => {
     if (!user) return;
 
+    // If we have an address ID from cart, fetch that specific address
+    if (addressIdFromCart) {
+      const { data } = await supabase
+        .from('addresses')
+        .select('*')
+        .eq('id', addressIdFromCart)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (data) {
+        setSelectedAddress(data);
+        return;
+      }
+    }
+
+    // Fallback to default address
     const { data } = await supabase
       .from('addresses')
       .select('*')
