@@ -9,7 +9,7 @@ import BottomNav from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 
 const menuItems = [
-  { icon: MapPin, label: 'Endereços', badge: '2' },
+  { icon: MapPin, label: 'Endereços', path: '/addresses' },
   { icon: CreditCard, label: 'Formas de Pagamento' },
   { icon: Bell, label: 'Notificações' },
   { icon: HelpCircle, label: 'Ajuda e Suporte' },
@@ -128,31 +128,36 @@ const Profile = () => {
 
         {/* Menu Items */}
         <div className="space-y-2">
-          {menuItems.map((item, index) => (
-            <motion.button
-              key={item.label}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="w-full flex items-center justify-between p-4 bg-card rounded-2xl 
-                         shadow-card hover:shadow-elevated transition-all"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
-                  <item.icon size={20} className="text-foreground" />
+          {menuItems.map((item, index) => {
+            const content = (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="w-full flex items-center justify-between p-4 bg-card rounded-2xl 
+                           shadow-card hover:shadow-elevated transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
+                    <item.icon size={20} className="text-foreground" />
+                  </div>
+                  <span className="font-medium text-foreground">{item.label}</span>
                 </div>
-                <span className="font-medium text-foreground">{item.label}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                {item.badge && (
-                  <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                    {item.badge}
-                  </span>
-                )}
                 <ChevronRight size={20} className="text-muted-foreground" />
-              </div>
-            </motion.button>
-          ))}
+              </motion.div>
+            );
+
+            if (item.path) {
+              return (
+                <Link key={item.label} to={item.path}>
+                  {content}
+                </Link>
+              );
+            }
+
+            return <div key={item.label}>{content}</div>;
+          })}
         </div>
 
         {/* Pizzeria Info */}
