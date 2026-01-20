@@ -1,17 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Trash2, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Trash2, ShoppingBag, MapPin, ChevronRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { usePizzeria } from '@/contexts/PizzeriaContext';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import CartItemComponent from '@/components/CartItem';
 import BottomNav from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 
+interface AddressData {
+  cep: string;
+  street: string;
+  city: string;
+  number: string;
+  complement?: string;
+  phone: string;
+}
+
 const Cart = () => {
   const { items, totalPrice, clearCart } = useCart();
   const pizzeria = usePizzeria();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [savedAddress, setSavedAddress] = useState<AddressData | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      fetchAddress();
+    }
+  }, [user]);
+
+  const fetchAddress = async () => {
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('profiles')
+      .select('address')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (data?.address) {
+      try {
+        const parsed = JSON.parse(data.address);
+        setSavedAddress(parsed);
+      } catch {
+        setSavedAddress(null);
+      }
+    }
+  };
 
   const subtotal = totalPrice;
   const deliveryFee = pizzeria.deliveryFee;
@@ -94,6 +132,31 @@ const Cart = () => {
         {items.map((item, index) => (
           <CartItemComponent key={item.id} item={item} index={index} />
         ))}
+      </div>
+
+      {/* Delivery Address */}
+      <div className="px-4 py-2">
+        <Link to="/addresses">
+          <div className="bg-card rounded-2xl p-4 shadow-card flex items-center justify-between hover:shadow-elevated transition-all">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <MapPin size={20} className="text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Entregar em</p>
+                {savedAddress ? (
+                  <p className="font-medium text-foreground">
+                    {savedAddress.street}, {savedAddress.number}
+                    {savedAddress.complement && ` - ${savedAddress.complement}`}
+                  </p>
+                ) : (
+                  <p className="font-medium text-primary">Adicionar endereço</p>
+                )}
+              </div>
+            </div>
+            <ChevronRight size={20} className="text-muted-foreground" />
+          </div>
+        </Link>
       </div>
 
       {/* Summary */}
