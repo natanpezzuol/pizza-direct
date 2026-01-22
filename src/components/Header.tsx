@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ShoppingCart, Clock, MapPin, MessageCircle } from 'lucide-react';
 import { usePizzeria } from '@/contexts/PizzeriaContext';
 import { useCart } from '@/contexts/CartContext';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import PizzeriaInfo from './PizzeriaInfo';
 
 const Header = () => {
   const pizzeria = usePizzeria();
   const { totalItems } = useCart();
+  const [showInfo, setShowInfo] = useState(false);
 
   return (
     <motion.header 
@@ -18,7 +20,10 @@ const Header = () => {
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 md:py-4">
         <div className="flex items-center justify-between">
           {/* Logo and Name */}
-          <Link to="/" className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
+          <button 
+            onClick={() => setShowInfo(true)}
+            className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1 text-left hover:opacity-80 transition-opacity active:scale-[0.98]"
+          >
             <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl gradient-hero flex items-center justify-center shadow-glow flex-shrink-0">
               <span className="text-xl sm:text-2xl md:text-3xl">🍕</span>
             </div>
@@ -31,7 +36,7 @@ const Header = () => {
                 <span className="truncate">{pizzeria.openingHours}</span>
               </div>
             </div>
-          </Link>
+          </button>
 
           {/* Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0">
@@ -60,6 +65,8 @@ const Header = () => {
           </div>
         </div>
       </div>
+
+      <PizzeriaInfo isOpen={showInfo} onClose={() => setShowInfo(false)} />
     </motion.header>
   );
 };
