@@ -1,23 +1,13 @@
 import React from 'react';
-import { ShoppingCart, Clock, MessageCircle, Home, Search, ClipboardList, User } from 'lucide-react';
+import { ShoppingCart, Clock, MessageCircle } from 'lucide-react';
 import { usePizzeria } from '@/contexts/PizzeriaContext';
 import { useCart } from '@/contexts/CartContext';
-import { useAuth } from '@/hooks/useAuth';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const Header = () => {
   const pizzeria = usePizzeria();
   const { totalItems } = useCart();
-  const { user } = useAuth();
-  const location = useLocation();
-
-  const navItems = [
-    { icon: Home, label: 'Início', path: '/' },
-    { icon: Search, label: 'Buscar', path: '/search' },
-    ...(user ? [{ icon: ClipboardList, label: 'Pedidos', path: '/orders' }] : []),
-    { icon: User, label: 'Perfil', path: '/profile' },
-  ];
 
   return (
     <motion.header 
@@ -28,7 +18,7 @@ const Header = () => {
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 md:py-4">
         <div className="flex items-center justify-between">
           {/* Logo and Name */}
-          <Link to="/" className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0">
+          <Link to="/" className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
             <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl gradient-hero flex items-center justify-center shadow-glow flex-shrink-0">
               <span className="text-xl sm:text-2xl md:text-3xl">🍕</span>
             </div>
@@ -42,27 +32,6 @@ const Header = () => {
               </div>
             </div>
           </Link>
-
-          {/* Desktop/Tablet Navigation */}
-          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`relative flex items-center gap-2 px-3 lg:px-4 py-2 lg:py-2.5 rounded-xl transition-colors ${
-                    isActive 
-                      ? 'text-primary bg-primary/10' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-                  }`}
-                >
-                  <item.icon size={18} className="lg:w-5 lg:h-5" />
-                  <span className="text-sm lg:text-base font-medium">{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
 
           {/* Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0">
