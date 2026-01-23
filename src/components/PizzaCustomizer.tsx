@@ -103,11 +103,15 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 
-                       bg-background rounded-t-2xl sm:rounded-t-3xl md:rounded-3xl z-50 
-                       max-h-[85vh] sm:max-h-[90vh] md:max-h-[90vh] lg:max-h-[92vh]
-                       md:max-w-3xl lg:max-w-4xl xl:max-w-5xl md:w-[90vw] lg:w-[85vw] xl:w-[80vw]
-                       overflow-y-auto md:shadow-2xl"
+            className="fixed z-50 bg-background overflow-y-auto
+                       bottom-0 left-0 right-0 rounded-t-2xl sm:rounded-t-3xl
+                       max-h-[85vh] sm:max-h-[90vh]
+                       md:rounded-3xl md:shadow-2xl
+                       md:top-1/2 md:left-1/2 md:right-auto md:bottom-auto
+                       md:-translate-x-1/2 md:-translate-y-1/2
+                       md:max-h-[90vh] lg:max-h-[92vh]
+                       md:max-w-3xl lg:max-w-4xl xl:max-w-5xl 
+                       md:w-[90vw] lg:w-[85vw] xl:w-[80vw]"
           >
             {/* Handle - only on mobile */}
             <div className="sticky top-0 bg-background pt-2 sm:pt-3 pb-1.5 sm:pb-2 z-10 md:hidden">
