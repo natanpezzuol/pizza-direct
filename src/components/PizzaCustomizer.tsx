@@ -105,8 +105,8 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed bottom-0 left-0 right-0 md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 
                        bg-background rounded-t-2xl sm:rounded-t-3xl md:rounded-3xl z-50 
-                       max-h-[85vh] sm:max-h-[90vh] md:max-h-[85vh] lg:max-h-[90vh]
-                       md:max-w-2xl lg:max-w-3xl xl:max-w-4xl md:w-full 
+                       max-h-[85vh] sm:max-h-[90vh] md:max-h-[90vh] lg:max-h-[92vh]
+                       md:max-w-3xl lg:max-w-4xl xl:max-w-5xl md:w-[90vw] lg:w-[85vw] xl:w-[80vw]
                        overflow-y-auto md:shadow-2xl"
           >
             {/* Handle - only on mobile */}
@@ -117,13 +117,13 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-3 sm:top-4 md:top-5 lg:top-6 right-3 sm:right-4 md:right-5 lg:right-6 w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 rounded-full bg-secondary hover:bg-secondary/80 flex items-center justify-center z-20 active:scale-95 transition-colors"
+              className="absolute top-3 sm:top-4 md:top-6 lg:top-8 right-3 sm:right-4 md:right-6 lg:right-8 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full bg-secondary hover:bg-secondary/80 flex items-center justify-center z-20 active:scale-95 transition-colors"
             >
-              <X size={18} className="sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-foreground" />
+              <X size={18} className="sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 text-foreground" />
             </button>
             
             {/* Image */}
-            <div className="relative h-36 sm:h-48 md:h-64 lg:h-72 xl:h-80 mx-3 sm:mx-4 md:mx-6 lg:mx-8 md:mt-4 lg:mt-6 rounded-xl sm:rounded-2xl lg:rounded-3xl overflow-hidden">
+            <div className="relative h-36 sm:h-48 md:h-72 lg:h-80 xl:h-96 mx-3 sm:mx-4 md:mx-8 lg:mx-10 md:mt-6 lg:mt-8 rounded-xl sm:rounded-2xl lg:rounded-3xl overflow-hidden">
               <img 
                 src={image} 
                 alt={pizza.name}
@@ -132,18 +132,18 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
             </div>
             
             {/* Content */}
-            <div className="p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 pb-28 sm:pb-32 md:pb-28 lg:pb-32">
-              <h2 className="font-display font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-foreground mb-1 sm:mb-2 md:mb-3 lg:mb-4">
+            <div className="p-3 sm:p-4 md:p-8 lg:p-10 xl:p-12 pb-28 sm:pb-32 md:pb-32 lg:pb-36">
+              <h2 className="font-display font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-foreground mb-1 sm:mb-2 md:mb-4 lg:mb-5">
                 {pizza.name}
               </h2>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-4 sm:mb-6 md:mb-8 lg:mb-10">{pizza.description}</p>
+              <p className="text-sm sm:text-base md:text-xl lg:text-2xl text-muted-foreground mb-4 sm:mb-6 md:mb-10 lg:mb-12">{pizza.description}</p>
               
               {/* Size Selection */}
-              <div className="mb-4 sm:mb-6 md:mb-8 lg:mb-10">
-                <h3 className="font-display font-semibold text-sm sm:text-base md:text-lg lg:text-xl text-foreground mb-2 sm:mb-3 md:mb-4 lg:mb-5">
+              <div className="mb-4 sm:mb-6 md:mb-10 lg:mb-12">
+                <h3 className="font-display font-semibold text-sm sm:text-base md:text-xl lg:text-2xl text-foreground mb-2 sm:mb-3 md:mb-5 lg:mb-6">
                   Tamanho
                 </h3>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 sm:gap-2 md:gap-4 lg:gap-5">
                   {sizes.map((size) => {
                     const isSelected = selectedSize === size.id;
                     const price = pizza.prices[size.id as keyof typeof pizza.prices];
@@ -152,7 +152,7 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                         key={size.id}
                         onClick={() => setSelectedSize(size.id)}
                         className={`
-                          relative p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl lg:rounded-3xl border-2 transition-all active:scale-[0.98] hover:border-primary/70
+                          relative p-3 sm:p-4 md:p-6 lg:p-8 rounded-xl sm:rounded-2xl lg:rounded-3xl border-2 transition-all active:scale-[0.98] hover:border-primary/70
                           ${isSelected 
                             ? 'border-primary bg-primary/5' 
                             : 'border-border bg-card hover:border-primary/50'
@@ -160,16 +160,16 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                         `}
                       >
                         {isSelected && (
-                          <div className="absolute top-1.5 sm:top-2 md:top-3 lg:top-4 right-1.5 sm:right-2 md:right-3 lg:right-4 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 rounded-full gradient-hero flex items-center justify-center">
-                            <Check size={10} className="sm:w-3 sm:h-3 md:w-4 md:h-4 lg:w-5 lg:h-5 text-primary-foreground" />
+                          <div className="absolute top-1.5 sm:top-2 md:top-4 lg:top-5 right-1.5 sm:right-2 md:right-4 lg:right-5 w-4 h-4 sm:w-5 sm:h-5 md:w-7 md:h-7 lg:w-8 lg:h-8 rounded-full gradient-hero flex items-center justify-center">
+                            <Check size={10} className="sm:w-3 sm:h-3 md:w-5 md:h-5 lg:w-6 lg:h-6 text-primary-foreground" />
                           </div>
                         )}
                         <div className="text-left">
-                          <p className="font-bold text-sm sm:text-base md:text-lg lg:text-xl text-foreground">{size.name}</p>
-                          <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-muted-foreground">
+                          <p className="font-bold text-sm sm:text-base md:text-xl lg:text-2xl text-foreground">{size.name}</p>
+                          <p className="text-[10px] sm:text-xs md:text-base lg:text-lg text-muted-foreground">
                             {size.slices} • {size.serves}
                           </p>
-                          <p className="font-bold text-primary text-sm sm:text-base md:text-lg lg:text-xl mt-0.5 sm:mt-1 md:mt-2 lg:mt-3">
+                          <p className="font-bold text-primary text-sm sm:text-base md:text-xl lg:text-2xl mt-0.5 sm:mt-1 md:mt-3 lg:mt-4">
                             R$ {price.toFixed(2)}
                           </p>
                         </div>
@@ -180,11 +180,11 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
               </div>
               
               {/* Crust Selection */}
-              <div className="mb-4 sm:mb-6 md:mb-8 lg:mb-10">
-                <h3 className="font-display font-semibold text-sm sm:text-base md:text-lg lg:text-xl text-foreground mb-2 sm:mb-3 md:mb-4 lg:mb-5">
+              <div className="mb-4 sm:mb-6 md:mb-10 lg:mb-12">
+                <h3 className="font-display font-semibold text-sm sm:text-base md:text-xl lg:text-2xl text-foreground mb-2 sm:mb-3 md:mb-5 lg:mb-6">
                   Borda
                 </h3>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-4 lg:gap-5">
                   {crusts.map((crust) => {
                     const isSelected = selectedCrust === crust.id;
                     return (
@@ -192,7 +192,7 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                         key={crust.id}
                         onClick={() => setSelectedCrust(crust.id)}
                         className={`
-                          px-3 sm:px-4 md:px-5 lg:px-6 py-2 sm:py-2.5 md:py-3 lg:py-4 rounded-lg sm:rounded-xl md:rounded-2xl font-medium text-xs sm:text-sm md:text-base lg:text-lg transition-all active:scale-95 hover:scale-[1.02]
+                          px-3 sm:px-4 md:px-8 lg:px-10 py-2 sm:py-2.5 md:py-4 lg:py-5 rounded-lg sm:rounded-xl md:rounded-2xl font-medium text-xs sm:text-sm md:text-lg lg:text-xl transition-all active:scale-95 hover:scale-[1.02]
                           ${isSelected 
                             ? 'gradient-hero text-primary-foreground shadow-glow' 
                             : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
@@ -201,7 +201,7 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                       >
                         {crust.name}
                         {crust.price > 0 && (
-                          <span className="ml-1 opacity-80">+R${crust.price}</span>
+                          <span className="ml-1 md:ml-2 opacity-80">+R${crust.price}</span>
                         )}
                       </button>
                     );
@@ -210,11 +210,11 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
               </div>
               
               {/* Extras */}
-              <div className="mb-4 sm:mb-6 md:mb-8 lg:mb-10">
-                <h3 className="font-display font-semibold text-sm sm:text-base md:text-lg lg:text-xl text-foreground mb-2 sm:mb-3 md:mb-4 lg:mb-5">
+              <div className="mb-4 sm:mb-6 md:mb-10 lg:mb-12">
+                <h3 className="font-display font-semibold text-sm sm:text-base md:text-xl lg:text-2xl text-foreground mb-2 sm:mb-3 md:mb-5 lg:mb-6">
                   Adicionais
                 </h3>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 sm:gap-2 md:gap-4 lg:gap-5">
                   {extras.map((extra) => {
                     const isSelected = selectedExtras.includes(extra.id);
                     return (
@@ -222,7 +222,7 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                         key={extra.id}
                         onClick={() => toggleExtra(extra.id)}
                         className={`
-                          w-full flex items-center justify-between p-3 sm:p-4 md:p-5 lg:p-6 rounded-lg sm:rounded-xl md:rounded-2xl 
+                          w-full flex items-center justify-between p-3 sm:p-4 md:p-6 lg:p-8 rounded-lg sm:rounded-xl md:rounded-2xl 
                           border-2 transition-all active:scale-[0.98] hover:border-primary/70
                           ${isSelected 
                             ? 'border-primary bg-primary/5' 
@@ -230,19 +230,19 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                           }
                         `}
                       >
-                        <span className="font-medium text-sm sm:text-base md:text-lg lg:text-xl text-foreground">{extra.name}</span>
-                        <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
-                          <span className="text-primary font-bold text-sm sm:text-base md:text-lg lg:text-xl">
+                        <span className="font-medium text-sm sm:text-base md:text-xl lg:text-2xl text-foreground">{extra.name}</span>
+                        <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 lg:gap-5">
+                          <span className="text-primary font-bold text-sm sm:text-base md:text-xl lg:text-2xl">
                             +R$ {extra.price.toFixed(2)}
                           </span>
                           <div className={`
-                            w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 rounded-full border-2 flex items-center justify-center transition-all
+                            w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-full border-2 flex items-center justify-center transition-all
                             ${isSelected 
                               ? 'gradient-hero border-transparent' 
                               : 'border-border'
                             }
                           `}>
-                            {isSelected && <Check size={12} className="sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-primary-foreground" />}
+                            {isSelected && <Check size={12} className="sm:w-3.5 sm:h-3.5 md:w-5 md:h-5 lg:w-6 lg:h-6 text-primary-foreground" />}
                           </div>
                         </div>
                       </button>
@@ -252,8 +252,8 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
               </div>
               
               {/* Observações */}
-              <div className="mb-4 sm:mb-6 md:mb-8 lg:mb-10">
-                <h3 className="font-display font-semibold text-sm sm:text-base md:text-lg lg:text-xl text-foreground mb-2 sm:mb-3 md:mb-4 lg:mb-5">
+              <div className="mb-4 sm:mb-6 md:mb-10 lg:mb-12">
+                <h3 className="font-display font-semibold text-sm sm:text-base md:text-xl lg:text-2xl text-foreground mb-2 sm:mb-3 md:mb-5 lg:mb-6">
                   Observações
                 </h3>
                 <textarea
@@ -261,41 +261,41 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Ex: Tirar cebola, bem assada..."
                   maxLength={200}
-                  className="w-full p-3 sm:p-4 md:p-5 lg:p-6 rounded-lg sm:rounded-xl md:rounded-2xl lg:rounded-3xl border-2 border-border bg-card text-sm sm:text-base md:text-lg lg:text-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors resize-none"
+                  className="w-full p-3 sm:p-4 md:p-6 lg:p-8 rounded-lg sm:rounded-xl md:rounded-2xl lg:rounded-3xl border-2 border-border bg-card text-sm sm:text-base md:text-xl lg:text-2xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors resize-none"
                   rows={2}
                 />
-                <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-muted-foreground mt-1 lg:mt-2 text-right">
+                <p className="text-[10px] sm:text-xs md:text-base lg:text-lg text-muted-foreground mt-1 lg:mt-2 text-right">
                   {notes.length}/200
                 </p>
               </div>
             </div>
             
             {/* Footer */}
-            <div className="fixed bottom-0 left-0 right-0 md:sticky md:bottom-auto bg-background border-t p-3 sm:p-4 md:p-6 lg:p-8 safe-area-bottom md:rounded-b-3xl">
-              <div className="flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8 max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto">
+            <div className="fixed bottom-0 left-0 right-0 md:sticky md:bottom-auto bg-background border-t p-3 sm:p-4 md:p-8 lg:p-10 safe-area-bottom md:rounded-b-3xl">
+              <div className="flex items-center gap-2 sm:gap-4 md:gap-8 lg:gap-10 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto">
                 {/* Quantity */}
-                <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 bg-secondary rounded-lg sm:rounded-xl md:rounded-2xl p-0.5 sm:p-1 md:p-1.5 lg:p-2">
+                <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-5 bg-secondary rounded-lg sm:rounded-xl md:rounded-2xl p-0.5 sm:p-1 md:p-2 lg:p-2.5">
                   <button
                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                    className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-md sm:rounded-lg md:rounded-xl lg:rounded-2xl bg-background flex items-center justify-center active:scale-95 hover:bg-muted transition-colors"
+                    className="w-8 h-8 sm:w-10 sm:h-10 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-md sm:rounded-lg md:rounded-xl lg:rounded-2xl bg-background flex items-center justify-center active:scale-95 hover:bg-muted transition-colors"
                   >
-                    <Minus size={16} className="sm:w-[18px] sm:h-[18px] md:w-5 md:h-5 lg:w-6 lg:h-6 text-foreground" />
+                    <Minus size={16} className="sm:w-[18px] sm:h-[18px] md:w-6 md:h-6 lg:w-8 lg:h-8 text-foreground" />
                   </button>
-                  <span className="w-6 sm:w-8 md:w-10 lg:w-12 text-center font-bold text-sm sm:text-base md:text-lg lg:text-xl text-foreground">
+                  <span className="w-6 sm:w-8 md:w-12 lg:w-14 text-center font-bold text-sm sm:text-base md:text-2xl lg:text-3xl text-foreground">
                     {quantity}
                   </span>
                   <button
                     onClick={() => setQuantity(q => q + 1)}
-                    className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-md sm:rounded-lg md:rounded-xl lg:rounded-2xl bg-background flex items-center justify-center active:scale-95 hover:bg-muted transition-colors"
+                    className="w-8 h-8 sm:w-10 sm:h-10 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-md sm:rounded-lg md:rounded-xl lg:rounded-2xl bg-background flex items-center justify-center active:scale-95 hover:bg-muted transition-colors"
                   >
-                    <Plus size={16} className="sm:w-[18px] sm:h-[18px] md:w-5 md:h-5 lg:w-6 lg:h-6 text-foreground" />
+                    <Plus size={16} className="sm:w-[18px] sm:h-[18px] md:w-6 md:h-6 lg:w-8 lg:h-8 text-foreground" />
                   </button>
                 </div>
                 
                 {/* Add Button */}
                 <Button
                   onClick={handleAddToCart}
-                  className="flex-1 h-10 sm:h-12 md:h-14 lg:h-16 gradient-hero text-primary-foreground font-bold text-sm sm:text-base md:text-lg lg:text-xl rounded-lg sm:rounded-xl md:rounded-2xl shadow-glow active:scale-[0.98] hover:opacity-95 transition-all"
+                  className="flex-1 h-10 sm:h-12 md:h-16 lg:h-20 gradient-hero text-primary-foreground font-bold text-sm sm:text-base md:text-xl lg:text-2xl rounded-lg sm:rounded-xl md:rounded-2xl shadow-glow active:scale-[0.98] hover:opacity-95 transition-all"
                 >
                   Adicionar • R$ {totalPrice.toFixed(2)}
                 </Button>
