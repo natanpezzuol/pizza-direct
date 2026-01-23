@@ -109,9 +109,9 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                        md:rounded-3xl md:shadow-2xl
                        md:top-1/2 md:left-1/2 md:right-auto md:bottom-auto
                        md:-translate-x-1/2 md:-translate-y-1/2
-                       md:max-h-[90vh] lg:max-h-[92vh]
-                       md:max-w-3xl lg:max-w-4xl xl:max-w-5xl 
-                       md:w-[90vw] lg:w-[85vw] xl:w-[80vw]"
+                       md:max-h-[95vh] lg:max-h-[95vh]
+                       md:max-w-[95vw] lg:max-w-[90vw] xl:max-w-6xl
+                       md:w-[95vw] lg:w-[90vw] xl:w-[85vw]"
           >
             {/* Handle - only on mobile */}
             <div className="sticky top-0 bg-background pt-2 sm:pt-3 pb-1.5 sm:pb-2 z-10 md:hidden">
