@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, User, MapPin, CreditCard, Bell, HelpCircle, LogOut, ChevronRight, LogIn } from 'lucide-react';
+import { ArrowLeft, User, MapPin, CreditCard, Bell, HelpCircle, LogOut, ChevronRight, LogIn, Settings } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePizzeria } from '@/contexts/PizzeriaContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/contexts/NotificationsContext';
+import { supabase } from '@/integrations/supabase/client';
 import BottomNav from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 
@@ -15,12 +16,31 @@ const Profile = () => {
   const { toast } = useToast();
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      
+      setIsAdmin(!!data);
+    };
+
+    checkAdminStatus();
+  }, [user]);
 
   const menuItems = [
     { icon: MapPin, label: 'Endereços', path: '/addresses' },
     { icon: CreditCard, label: 'Formas de Pagamento' },
     { icon: Bell, label: 'Notificações', path: '/notifications', badge: unreadCount },
     { icon: HelpCircle, label: 'Ajuda e Suporte' },
+    ...(isAdmin ? [{ icon: Settings, label: 'Painel Admin', path: '/admin' }] : []),
   ];
 
   const handleSignOut = async () => {
