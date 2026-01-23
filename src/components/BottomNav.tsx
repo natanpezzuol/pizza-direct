@@ -18,15 +18,15 @@ const BottomNav = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t safe-area-bottom">
-      <div className="container mx-auto px-2 sm:px-4 md:px-8 lg:px-12">
-        <div className="flex items-center justify-around md:justify-center md:gap-8 lg:gap-12 py-1.5 sm:py-2 md:py-3">
+      <div className="container mx-auto px-2 sm:px-4">
+        <div className="flex items-center justify-around py-1.5 sm:py-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className="relative flex flex-col items-center gap-0.5 sm:gap-1 py-1.5 sm:py-2 px-3 sm:px-4 md:px-6 active:scale-95 transition-transform"
+                className="relative flex flex-col items-center gap-0.5 sm:gap-1 py-1.5 sm:py-2 px-3 sm:px-4 active:scale-95 transition-transform"
               >
                 {isActive && (
                   <motion.div
@@ -37,10 +37,10 @@ const BottomNav = () => {
                 )}
                 <item.icon 
                   size={22} 
-                  className={`sm:w-6 sm:h-6 md:w-7 md:h-7 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} 
+                  className={`sm:w-6 sm:h-6 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} 
                 />
                 <span 
-                  className={`text-[10px] sm:text-xs md:text-sm font-medium ${
+                  className={`text-[10px] sm:text-xs font-medium ${
                     isActive ? 'text-primary' : 'text-muted-foreground'
                   }`}
                 >
