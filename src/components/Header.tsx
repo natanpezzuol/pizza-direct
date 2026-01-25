@@ -41,7 +41,7 @@ const Header = () => {
       <div className="container mx-auto px-3 sm:px-4 py-2 sm:py-3">
         <div className="flex items-center justify-between">
           {/* Logo and Name */}
-          <Link to="/" className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <Link to="/pizzeria" className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 active:scale-95 transition-transform">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl gradient-hero flex items-center justify-center shadow-glow flex-shrink-0">
               <span className="text-xl sm:text-2xl">🍕</span>
             </div>
