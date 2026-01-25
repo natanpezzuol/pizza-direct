@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Truck, Star } from 'lucide-react';
+import { Clock, Truck, Star, AlertCircle } from 'lucide-react';
 import { usePizzeria } from '@/contexts/PizzeriaContext';
 import heroBanner from '@/assets/hero-banner.jpg';
 
 const HeroBanner = () => {
   const pizzeria = usePizzeria();
+  const isOpen = pizzeria.isOpen;
 
   return (
     <motion.section 
@@ -21,7 +22,15 @@ const HeroBanner = () => {
       />
       
       {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/40 to-transparent" />
+      <div className={`absolute inset-0 bg-gradient-to-t ${isOpen ? 'from-foreground/90 via-foreground/40' : 'from-destructive/90 via-destructive/40'} to-transparent`} />
+      
+      {/* Closed Banner */}
+      {!isOpen && (
+        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-destructive text-destructive-foreground px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs sm:text-sm font-medium">
+          <AlertCircle size={14} />
+          Fechado
+        </div>
+      )}
       
       {/* Content */}
       <div className="relative h-full flex flex-col justify-end p-3 sm:p-5">

@@ -4,10 +4,33 @@ import { usePizzeria } from '@/contexts/PizzeriaContext';
 import { useCart } from '@/contexts/CartContext';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Header = () => {
   const pizzeria = usePizzeria();
   const { totalItems } = useCart();
+  
+  if (pizzeria.loading) {
+    return (
+      <header className="sticky top-0 z-50 glass-card border-b safe-area-top">
+        <div className="container mx-auto px-3 sm:px-4 py-2 sm:py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Skeleton className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl" />
+              <div>
+                <Skeleton className="h-5 w-24 mb-1" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Skeleton className="w-10 h-10 rounded-xl" />
+              <Skeleton className="w-10 h-10 rounded-xl" />
+            </div>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <motion.header 

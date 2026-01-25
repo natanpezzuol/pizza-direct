@@ -1,4 +1,5 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PizzeriaConfig {
   name: string;
@@ -11,33 +12,88 @@ interface PizzeriaConfig {
   minimumOrder: number;
   deliveryFee: number;
   primaryColor: string;
+  isOpen: boolean;
 }
 
 const defaultConfig: PizzeriaConfig = {
-  name: "Bella Napoli",
+  name: "Carregando...",
   logo: "",
   banner: "",
-  address: "Rua das Pizzas, 123 - Centro",
-  phone: "(11) 99999-9999",
-  openingHours: "18:00 - 23:30",
+  address: "",
+  phone: "",
+  openingHours: "",
   deliveryTime: "30-45 min",
   minimumOrder: 30,
   deliveryFee: 5.99,
   primaryColor: "#E85D04",
+  isOpen: true,
 };
 
-const PizzeriaContext = createContext<PizzeriaConfig>(defaultConfig);
+interface PizzeriaContextType {
+  config: PizzeriaConfig;
+  loading: boolean;
+  refetch: () => Promise<void>;
+}
 
-export const PizzeriaProvider = ({ children, config }: { children: ReactNode; config?: Partial<PizzeriaConfig> }) => {
-  const mergedConfig = { ...defaultConfig, ...config };
-  
+const PizzeriaContext = createContext<PizzeriaContextType>({
+  config: defaultConfig,
+  loading: true,
+  refetch: async () => {},
+});
+
+export const PizzeriaProvider = ({ children }: { children: ReactNode }) => {
+  const [config, setConfig] = useState<PizzeriaConfig>(defaultConfig);
+  const [loading, setLoading] = useState(true);
+
+  const fetchSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('pizzeria_settings')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      
+      if (data) {
+        setConfig({
+          name: data.name,
+          logo: "",
+          banner: "",
+          address: data.address,
+          phone: data.phone,
+          openingHours: data.opening_hours,
+          deliveryTime: data.delivery_time,
+          minimumOrder: Number(data.minimum_order),
+          deliveryFee: Number(data.delivery_fee),
+          primaryColor: data.primary_color,
+          isOpen: data.is_open,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching pizzeria settings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
   return (
-    <PizzeriaContext.Provider value={mergedConfig}>
+    <PizzeriaContext.Provider value={{ config, loading, refetch: fetchSettings }}>
       {children}
     </PizzeriaContext.Provider>
   );
 };
 
 export const usePizzeria = () => {
-  return useContext(PizzeriaContext);
+  const context = useContext(PizzeriaContext);
+  // Return config directly for backward compatibility
+  return {
+    ...context.config,
+    loading: context.loading,
+    refetch: context.refetch,
+  };
 };
