@@ -37,7 +37,7 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
   const navigate = useNavigate();
   const { addItem } = useCart();
   const { user } = useAuth();
-  const [selectedSize, setSelectedSize] = useState('medium');
+  const [selectedSize, setSelectedSize] = useState('small');
   const [selectedCrust, setSelectedCrust] = useState('tradicional');
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
