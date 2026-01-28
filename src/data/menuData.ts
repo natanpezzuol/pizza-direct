@@ -115,10 +115,8 @@ export const pizzas: Pizza[] = [
 ];
 
 export const sizes = [
-  { id: 'small', name: 'Pequena', slices: '4 fatias', serves: '1 pessoa' },
-  { id: 'medium', name: 'Média', slices: '6 fatias', serves: '2 pessoas' },
-  { id: 'large', name: 'Grande', slices: '8 fatias', serves: '3 pessoas' },
-  { id: 'family', name: 'Família', slices: '12 fatias', serves: '4+ pessoas' },
+  { id: 'small', name: 'Pequena', slices: '4 fatias', serves: '1-2 pessoas' },
+  { id: 'large', name: 'Grande', slices: '8 fatias', serves: '3-4 pessoas' },
 ];
 
 export const crusts = [
