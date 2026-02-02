@@ -75,6 +75,27 @@ export const useMenuItems = () => {
 
   useEffect(() => {
     fetchMenuItems();
+
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel('menu_items_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'menu_items',
+        },
+        (payload) => {
+          console.log('Menu items changed:', payload);
+          fetchMenuItems();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [fetchMenuItems]);
 
   // Convert to Pizza format for backward compatibility

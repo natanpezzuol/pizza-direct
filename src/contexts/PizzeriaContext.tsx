@@ -79,6 +79,27 @@ export const PizzeriaProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     fetchSettings();
+
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel('pizzeria_settings_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'pizzeria_settings',
+        },
+        (payload) => {
+          console.log('Pizzeria settings changed:', payload);
+          fetchSettings();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (
