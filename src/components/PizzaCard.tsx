@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Star, Plus } from 'lucide-react';
 import { Pizza } from '@/data/menuData';
 
-// Import fallback pizza images
+// Import pizza images
 import pizzaMargherita from '@/assets/pizza-margherita.jpg';
 import pizzaCalabresa from '@/assets/pizza-calabresa.jpg';
 import pizzaQuatroQueijos from '@/assets/pizza-quatro-queijos.jpg';
@@ -11,12 +11,17 @@ import pizzaPortuguesa from '@/assets/pizza-portuguesa.jpg';
 import pizzaFrango from '@/assets/pizza-frango.jpg';
 import pizzaChocolate from '@/assets/pizza-chocolate.jpg';
 
-// Fallback images for pizzas without custom image_url
-const fallbackImages: Record<string, string> = {
-  'tradicionais': pizzaMargherita,
-  'especiais': pizzaQuatroQueijos,
-  'premium': pizzaPortuguesa,
-  'doces': pizzaChocolate,
+const pizzaImages: Record<string, string> = {
+  '1': pizzaMargherita,
+  '2': pizzaCalabresa,
+  '3': pizzaQuatroQueijos,
+  '4': pizzaPortuguesa,
+  '5': pizzaFrango,
+  '6': pizzaCalabresa, // pepperoni uses calabresa image
+  '7': pizzaMargherita, // napolitana uses margherita
+  '8': pizzaFrango, // filé mignon uses frango
+  '9': pizzaChocolate,
+  '10': pizzaChocolate, // romeu e julieta uses chocolate
 };
 
 interface PizzaCardProps {
@@ -26,8 +31,7 @@ interface PizzaCardProps {
 }
 
 const PizzaCard = ({ pizza, onClick, index }: PizzaCardProps) => {
-  // Use image from database (pizza.image) if available, otherwise use category fallback
-  const image = pizza.image || fallbackImages[pizza.category] || pizzaMargherita;
+  const image = pizzaImages[pizza.id] || pizzaMargherita;
   
   return (
     <motion.article
