@@ -216,6 +216,26 @@ export const useAdmin = () => {
     }
   }, [isAdmin]);
 
+  // Realtime subscription for orders
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const channel = supabase
+      .channel('admin-orders-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => {
+          fetchOrders();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isAdmin, fetchOrders]);
+
   // Update order status
   const updateOrderStatus = async (orderId: string, status: string) => {
     try {
