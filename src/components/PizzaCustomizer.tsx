@@ -174,43 +174,69 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
               {/* Two Flavors Option */}
               <div className="mb-4 sm:mb-6">
                 <h3 className="font-display font-semibold text-sm sm:text-base text-foreground mb-2 sm:mb-3">
-                  🍕 Sabores
+                  🍕 Quantos sabores?
                 </h3>
                 
-                {/* Toggle for 2 flavors */}
-                <button
-                  onClick={handleTwoFlavorsToggle}
-                  className={`
-                    w-full flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl 
-                    border-2 transition-all active:scale-[0.98] mb-3
-                    ${wantsTwoFlavors 
-                      ? 'border-primary bg-primary/5' 
-                      : 'border-border bg-card hover:border-primary/50'
-                    }
-                  `}
-                >
-                  <div className="text-left">
-                    <p className="font-bold text-sm sm:text-base text-foreground">
-                      Quero 2 sabores (meio a meio)
+                {/* Toggle options for 1 or 2 flavors */}
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {/* 1 Sabor */}
+                  <button
+                    onClick={() => { setWantsTwoFlavors(false); setSecondFlavor(''); }}
+                    className={`
+                      flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl sm:rounded-2xl 
+                      border-2 transition-all active:scale-[0.98]
+                      ${!wantsTwoFlavors 
+                        ? 'border-primary bg-primary/5' 
+                        : 'border-border bg-card hover:border-primary/50'
+                      }
+                    `}
+                  >
+                    <div className={`
+                      w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all mb-2
+                      ${!wantsTwoFlavors 
+                        ? 'gradient-hero border-transparent' 
+                        : 'border-border'
+                      }
+                    `}>
+                      {!wantsTwoFlavors && <Check size={12} className="sm:w-3.5 sm:h-3.5 text-primary-foreground" />}
+                    </div>
+                    <p className="font-bold text-sm sm:text-base text-foreground">1 Sabor</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground text-center">
+                      Pizza inteira
                     </p>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground">
-                      O valor será do sabor mais caro
+                  </button>
+
+                  {/* 2 Sabores */}
+                  <button
+                    onClick={() => setWantsTwoFlavors(true)}
+                    className={`
+                      flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl sm:rounded-2xl 
+                      border-2 transition-all active:scale-[0.98]
+                      ${wantsTwoFlavors 
+                        ? 'border-primary bg-primary/5' 
+                        : 'border-border bg-card hover:border-primary/50'
+                      }
+                    `}
+                  >
+                    <div className={`
+                      w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all mb-2
+                      ${wantsTwoFlavors 
+                        ? 'gradient-hero border-transparent' 
+                        : 'border-border'
+                      }
+                    `}>
+                      {wantsTwoFlavors && <Check size={12} className="sm:w-3.5 sm:h-3.5 text-primary-foreground" />}
+                    </div>
+                    <p className="font-bold text-sm sm:text-base text-foreground">2 Sabores</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground text-center">
+                      Meio a meio
                     </p>
-                  </div>
-                  <div className={`
-                    w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all
-                    ${wantsTwoFlavors 
-                      ? 'gradient-hero border-transparent' 
-                      : 'border-border'
-                    }
-                  `}>
-                    {wantsTwoFlavors && <Check size={12} className="sm:w-3.5 sm:h-3.5 text-primary-foreground" />}
-                  </div>
-                </button>
+                  </button>
+                </div>
 
                 {/* First flavor display */}
                 <div className="p-3 sm:p-4 rounded-xl bg-secondary/50 mb-2">
-                  <p className="text-xs text-muted-foreground mb-1">1º Sabor</p>
+                  <p className="text-xs text-muted-foreground mb-1">{wantsTwoFlavors ? '1º Sabor' : 'Sabor'}</p>
                   <p className="font-bold text-foreground">{pizza.name}</p>
                 </div>
 
@@ -240,6 +266,9 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                         ✓ {availablePizzas.find(p => p.id === secondFlavor)?.name}
                       </p>
                     )}
+                    <p className="text-[10px] text-muted-foreground mt-2">
+                      💡 O valor será do sabor mais caro
+                    </p>
                   </div>
                 )}
               </div>
