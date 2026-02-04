@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { ShoppingBag, Clock, MapPin, Phone, User, CreditCard, RefreshCw, Check, X, ChefHat, Truck } from 'lucide-react';
+import { ShoppingBag, Clock, MapPin, Phone, User, CreditCard, RefreshCw, Check, X, ChefHat, Truck, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -307,6 +307,30 @@ const AdminOrders = () => {
                   <div className="bg-muted p-2 rounded text-sm mb-3">
                     <p className="text-xs font-medium text-muted-foreground mb-1">Observações:</p>
                     <p>{order.notes}</p>
+                  </div>
+                )}
+
+                {/* Customer Rating */}
+                {order.rating && (
+                  <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg mb-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-xs font-medium text-yellow-700">Avaliação do Cliente:</p>
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            size={14}
+                            className={star <= order.rating!.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm font-medium text-yellow-700">
+                        {order.rating.rating}/5
+                      </span>
+                    </div>
+                    {order.rating.comment && (
+                      <p className="text-sm text-yellow-800 italic">"{order.rating.comment}"</p>
+                    )}
                   </div>
                 )}
 
