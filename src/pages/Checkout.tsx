@@ -126,26 +126,81 @@ const Checkout = () => {
       return;
     }
 
+    if (!user) {
+      toast({
+        title: 'Faça login para continuar',
+        variant: 'destructive',
+      });
+      navigate('/auth');
+      return;
+    }
+
     setLoading(true);
 
-    // Simulate order processing
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      // Fetch user profile for customer info
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('name, phone')
+        .eq('id', user.id)
+        .maybeSingle();
 
-    // Add notification
-    addNotification({
-      title: 'Pedido confirmado! 🎉',
-      description: `Seu pedido de R$ ${total.toFixed(2)} foi recebido e está sendo preparado.`,
-      type: 'success',
-    });
+      const customerName = profile?.name || user.email?.split('@')[0] || 'Cliente';
+      const customerPhone = selectedAddress.phone || profile?.phone || '';
 
-    toast({
-      title: 'Pedido realizado com sucesso!',
-      description: 'Acompanhe o status na aba de pedidos',
-    });
+      const deliveryAddressStr = `${selectedAddress.street}, ${selectedAddress.number}${selectedAddress.complement ? ` - ${selectedAddress.complement}` : ''}, ${selectedAddress.city}`;
 
-    clearCart();
-    setLoading(false);
-    navigate('/orders');
+      // Insert order with 'received' status - only changes to 'preparing' when admin accepts
+      const { error } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          customer_name: customerName,
+          customer_phone: customerPhone,
+          delivery_address: deliveryAddressStr,
+          items: items.map(item => ({
+            name: item.name,
+            size: item.size,
+            quantity: item.quantity,
+            price: item.price,
+            flavors: item.flavors,
+            crust: item.crust,
+            extras: item.extras,
+            notes: item.notes,
+          })),
+          subtotal: subtotal,
+          delivery_fee: deliveryFee,
+          total: total,
+          status: 'received', // Starts as 'received', admin accepts to move to 'preparing'
+          payment_method: selectedPayment,
+        });
+
+      if (error) throw error;
+
+      // Add notification
+      addNotification({
+        title: 'Pedido enviado! 🎉',
+        description: `Seu pedido de R$ ${total.toFixed(2)} foi recebido e aguarda confirmação.`,
+        type: 'success',
+      });
+
+      toast({
+        title: 'Pedido realizado com sucesso!',
+        description: 'Aguarde a confirmação da pizzaria',
+      });
+
+      clearCart();
+      navigate('/orders');
+    } catch (error) {
+      console.error('Error creating order:', error);
+      toast({
+        title: 'Erro ao criar pedido',
+        description: 'Tente novamente',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (items.length === 0) {
