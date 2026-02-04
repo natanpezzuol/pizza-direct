@@ -290,35 +290,58 @@ const AdminOrders = () => {
                   <p className="text-xs font-medium text-muted-foreground mb-2">Itens do Pedido:</p>
                   <div className="space-y-1">
                     {order.items.map((item: any, index: number) => (
-                      <div key={index} className="bg-muted/50 p-2 rounded text-sm space-y-1">
+                      <div key={index} className="bg-muted/50 p-3 rounded-lg text-sm space-y-2 border">
+                        {/* Item Header */}
                         <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <span className="font-medium">
-                              {item.quantity}x {item.name}
-                            </span>
-                            <p className="text-xs text-muted-foreground">
-                              {item.size} {item.crust && `• ${item.crust}`}
-                            </p>
-                            {item.flavors && item.flavors.length > 0 && (
-                              <p className="text-xs text-muted-foreground">
-                                Sabores: {item.flavors.join(', ')}
-                              </p>
-                            )}
-                            {item.extras && item.extras.length > 0 && (
-                              <p className="text-xs text-primary">
-                                + {item.extras.join(', ')}
-                              </p>
-                            )}
-                            {item.notes && (
-                              <p className="text-xs italic text-orange-600 mt-1">
-                                Obs: {item.notes}
-                              </p>
-                            )}
-                          </div>
-                          <span className="text-muted-foreground font-medium whitespace-nowrap ml-2">
+                          <span className="font-semibold text-base">
+                            {item.quantity}x {item.name}
+                          </span>
+                          <span className="font-bold text-primary whitespace-nowrap ml-2">
                             R$ {(item.price * item.quantity).toFixed(2)}
                           </span>
                         </div>
+                        
+                        {/* Details Grid */}
+                        <div className="flex flex-wrap gap-2">
+                          {/* Tamanho */}
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-200">
+                            📏 {item.size}
+                          </Badge>
+                          
+                          {/* Borda */}
+                          {item.crust && (
+                            <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200">
+                              🍕 {item.crust}
+                            </Badge>
+                          )}
+                        </div>
+
+                        {/* Sabores */}
+                        {item.flavors && item.flavors.length > 0 && (
+                          <div className="text-xs">
+                            <span className="font-medium text-muted-foreground">Sabores: </span>
+                            <span>{item.flavors.join(', ')}</span>
+                          </div>
+                        )}
+
+                        {/* Adicionais */}
+                        {item.extras && item.extras.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {item.extras.map((extra: string, i: number) => (
+                              <Badge key={i} variant="outline" className="bg-green-50 text-green-700 border-green-300 text-xs">
+                                ✓ {extra}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Observações */}
+                        {item.notes && (
+                          <div className="bg-orange-50 border border-orange-200 rounded p-2 text-xs">
+                            <span className="font-medium text-orange-700">📝 Observações: </span>
+                            <span className="text-orange-800">{item.notes}</span>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
