@@ -290,13 +290,35 @@ const AdminOrders = () => {
                   <p className="text-xs font-medium text-muted-foreground mb-2">Itens do Pedido:</p>
                   <div className="space-y-1">
                     {order.items.map((item: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between text-sm">
-                        <span>
-                          {item.quantity}x {item.name} ({item.size})
-                        </span>
-                        <span className="text-muted-foreground">
-                          R$ {(item.price * item.quantity).toFixed(2)}
-                        </span>
+                      <div key={index} className="bg-muted/50 p-2 rounded text-sm space-y-1">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <span className="font-medium">
+                              {item.quantity}x {item.name}
+                            </span>
+                            <p className="text-xs text-muted-foreground">
+                              {item.size} {item.crust && `• ${item.crust}`}
+                            </p>
+                            {item.flavors && item.flavors.length > 0 && (
+                              <p className="text-xs text-muted-foreground">
+                                Sabores: {item.flavors.join(', ')}
+                              </p>
+                            )}
+                            {item.extras && item.extras.length > 0 && (
+                              <p className="text-xs text-primary">
+                                + {item.extras.join(', ')}
+                              </p>
+                            )}
+                            {item.notes && (
+                              <p className="text-xs italic text-orange-600 mt-1">
+                                Obs: {item.notes}
+                              </p>
+                            )}
+                          </div>
+                          <span className="text-muted-foreground font-medium whitespace-nowrap ml-2">
+                            R$ {(item.price * item.quantity).toFixed(2)}
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>
