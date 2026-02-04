@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { ShoppingBag, Clock, MapPin, Phone, User, CreditCard, RefreshCw, Check, X, ChefHat, Truck, Star } from 'lucide-react';
+import { ShoppingBag, Clock, MapPin, Phone, User, CreditCard, RefreshCw, Check, X, ChefHat, Truck, Star, Circle, Ruler, MessageSquare, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -304,14 +304,16 @@ const AdminOrders = () => {
                         {/* Details Grid */}
                         <div className="flex flex-wrap gap-2">
                           {/* Tamanho */}
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-200">
-                            📏 {item.size}
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-200 gap-1">
+                            <Ruler className="h-3 w-3" />
+                            {item.size}
                           </Badge>
                           
                           {/* Borda */}
                           {item.crust && (
-                            <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200">
-                              🍕 {item.crust}
+                            <Badge variant="secondary" className="bg-purple-100 text-purple-700 border-purple-300 gap-1 font-medium">
+                              <Circle className="h-3 w-3" />
+                              Borda: {item.crust}
                             </Badge>
                           )}
                         </div>
@@ -328,8 +330,9 @@ const AdminOrders = () => {
                         {item.extras && item.extras.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {item.extras.map((extra: string, i: number) => (
-                              <Badge key={i} variant="outline" className="bg-green-50 text-green-700 border-green-300 text-xs">
-                                ✓ {extra}
+                              <Badge key={i} variant="outline" className="bg-green-50 text-green-700 border-green-300 text-xs gap-1">
+                                <Plus className="h-3 w-3" />
+                                {extra}
                               </Badge>
                             ))}
                           </div>
@@ -337,9 +340,12 @@ const AdminOrders = () => {
 
                         {/* Observações */}
                         {item.notes && (
-                          <div className="bg-orange-50 border border-orange-200 rounded p-2 text-xs">
-                            <span className="font-medium text-orange-700">📝 Observações: </span>
-                            <span className="text-orange-800">{item.notes}</span>
+                          <div className="bg-orange-50 border border-orange-200 rounded p-2 text-xs flex items-start gap-2">
+                            <MessageSquare className="h-3.5 w-3.5 text-orange-600 shrink-0 mt-0.5" />
+                            <div>
+                              <span className="font-medium text-orange-700">Observações: </span>
+                              <span className="text-orange-800">{item.notes}</span>
+                            </div>
                           </div>
                         )}
                       </div>
