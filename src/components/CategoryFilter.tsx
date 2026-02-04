@@ -1,13 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { categories } from '@/data/menuData';
+import { Category } from '@/data/menuData';
 
 interface CategoryFilterProps {
   selectedCategory: string;
   onSelectCategory: (categoryId: string) => void;
+  categories: Category[];
 }
 
-const CategoryFilter = ({ selectedCategory, onSelectCategory }: CategoryFilterProps) => {
+const CategoryFilter = ({ selectedCategory, onSelectCategory, categories }: CategoryFilterProps) => {
   return (
     <section className="px-3 sm:px-4 py-3 sm:py-4">
       <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide">

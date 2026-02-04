@@ -12,7 +12,7 @@ import { Loader2 } from 'lucide-react';
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPizza, setSelectedPizza] = useState<Pizza | null>(null);
-  const { pizzas, loading } = useMenuItems();
+  const { pizzas, categories, loading } = useMenuItems();
 
   const filteredPizzas = selectedCategory === 'all' 
     ? pizzas 
@@ -59,6 +59,7 @@ const Index = () => {
             <CategoryFilter 
               selectedCategory={selectedCategory}
               onSelectCategory={setSelectedCategory}
+              categories={categories}
             />
             
             {/* Menu Grid */}
