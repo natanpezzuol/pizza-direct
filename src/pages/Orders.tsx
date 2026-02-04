@@ -37,7 +37,7 @@ const statusMap: Record<string, OrderStatus> = {
   received: 'received',
   pending: 'received',
   preparing: 'preparing',
-  delivery: 'delivery',
+  delivering: 'delivering',
   delivered: 'delivered',
 };
 
@@ -45,7 +45,7 @@ const statusLabels: Record<string, string> = {
   received: 'Aguardando confirmação',
   pending: 'Aguardando confirmação',
   preparing: 'Em preparo',
-  delivery: 'Saiu para entrega',
+  delivering: 'Saiu para entrega',
   delivered: 'Entregue',
   cancelled: 'Cancelado',
 };
@@ -162,7 +162,8 @@ const Orders = () => {
               </h2>
               <OrderTracker 
                 status={statusMap[activeOrder.status] || 'received'} 
-                estimatedTime={activeOrder.status === 'preparing' ? '25 min' : activeOrder.status === 'delivery' ? '15 min' : undefined} 
+                orderId={activeOrder.id}
+                estimatedTime={activeOrder.status === 'preparing' ? '25 min' : activeOrder.status === 'delivering' ? '15 min' : undefined} 
               />
             </section>
 
@@ -175,7 +176,7 @@ const Orders = () => {
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                   activeOrder.status === 'received' ? 'bg-warning/10 text-warning' :
                   activeOrder.status === 'preparing' ? 'bg-primary/10 text-primary' :
-                  activeOrder.status === 'delivery' ? 'bg-info/10 text-info' :
+                  activeOrder.status === 'delivering' ? 'bg-info/10 text-info' :
                   'bg-muted text-muted-foreground'
                 }`}>
                   {statusLabels[activeOrder.status] || activeOrder.status}

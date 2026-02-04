@@ -1,23 +1,25 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, Clock, ChefHat, Truck, Package } from 'lucide-react';
+import { Check, Clock, ChefHat, Truck, Package, Hourglass } from 'lucide-react';
 
-export type OrderStatus = 'received' | 'preparing' | 'delivery' | 'delivered';
+export type OrderStatus = 'received' | 'preparing' | 'delivering' | 'delivered';
 
 interface OrderTrackerProps {
   status: OrderStatus;
+  orderId?: string;
   estimatedTime?: string;
 }
 
 const steps = [
-  { id: 'received', label: 'Recebido', icon: Check },
-  { id: 'preparing', label: 'Preparando', icon: ChefHat },
-  { id: 'delivery', label: 'Saiu para entrega', icon: Truck },
-  { id: 'delivered', label: 'Entregue', icon: Package },
+  { id: 'received', label: 'Recebido', icon: Hourglass, description: 'Aguardando confirmação' },
+  { id: 'preparing', label: 'Em Preparo', icon: ChefHat, description: 'Preparando seu pedido' },
+  { id: 'delivering', label: 'Saiu para entrega', icon: Truck, description: 'A caminho' },
+  { id: 'delivered', label: 'Entregue', icon: Package, description: 'Pedido finalizado' },
 ];
 
-const OrderTracker = ({ status, estimatedTime }: OrderTrackerProps) => {
+const OrderTracker = ({ status, orderId, estimatedTime }: OrderTrackerProps) => {
   const currentStepIndex = steps.findIndex(s => s.id === status);
+  const displayOrderId = orderId ? `#${orderId.slice(0, 8).toUpperCase()}` : '';
 
   return (
     <div className="bg-card rounded-3xl p-6 shadow-card">
@@ -27,9 +29,11 @@ const OrderTracker = ({ status, estimatedTime }: OrderTrackerProps) => {
           <h3 className="font-display font-bold text-foreground text-lg">
             Status do Pedido
           </h3>
-          <p className="text-sm text-muted-foreground">
-            Pedido #1234
-          </p>
+          {displayOrderId && (
+            <p className="text-sm text-muted-foreground">
+              Pedido {displayOrderId}
+            </p>
+          )}
         </div>
         {estimatedTime && (
           <div className="flex items-center gap-2 bg-primary/10 rounded-full px-3 py-1.5">
@@ -48,7 +52,7 @@ const OrderTracker = ({ status, estimatedTime }: OrderTrackerProps) => {
         <div 
           className="absolute left-5 top-0 w-0.5 gradient-hero transition-all duration-500"
           style={{ 
-            height: `${(currentStepIndex / (steps.length - 1)) * 100}%` 
+            height: currentStepIndex >= 0 ? `${(currentStepIndex / (steps.length - 1)) * 100}%` : '0%'
           }}
         />
         
@@ -96,7 +100,7 @@ const OrderTracker = ({ status, estimatedTime }: OrderTrackerProps) => {
                       animate={{ opacity: 1 }}
                       className="text-sm text-primary"
                     >
-                      Em andamento...
+                      {step.description}
                     </motion.p>
                   )}
                 </div>
