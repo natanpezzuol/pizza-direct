@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Package, MapPin } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Package, MapPin, Star } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import OrderTracker, { OrderStatus } from '@/components/OrderTracker';
+import OrderRating from '@/components/OrderRating';
 import BottomNav from '@/components/BottomNav';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 
 interface OrderItem {
   name: string;
@@ -31,6 +33,7 @@ interface Order {
   payment_method: string;
   notes: string | null;
   created_at: string;
+  hasRating?: boolean;
 }
 
 const statusMap: Record<string, OrderStatus> = {
@@ -54,26 +57,37 @@ const Orders = () => {
   const { user, loading } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [ratingOrderId, setRatingOrderId] = useState<string | null>(null);
 
   const fetchOrders = useCallback(async () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // Fetch orders
+      const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (ordersError) throw ordersError;
 
-      if (data) {
-        setOrders(data.map(order => ({
+      // Fetch ratings to check which orders have been rated
+      const { data: ratingsData } = await supabase
+        .from('order_ratings')
+        .select('order_id')
+        .eq('user_id', user.id);
+
+      const ratedOrderIds = new Set(ratingsData?.map(r => r.order_id) || []);
+
+      if (ordersData) {
+        setOrders(ordersData.map(order => ({
           ...order,
           subtotal: Number(order.subtotal),
           delivery_fee: Number(order.delivery_fee),
           total: Number(order.total),
           items: order.items as unknown as OrderItem[],
+          hasRating: ratedOrderIds.has(order.id),
         })));
       }
     } catch (error) {
@@ -281,6 +295,23 @@ const Orders = () => {
                   </p>
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-primary">R$ {order.total.toFixed(2)}</span>
+                    {order.status === 'delivered' && !order.hasRating && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-yellow-600 border-yellow-300 hover:bg-yellow-50"
+                        onClick={() => setRatingOrderId(order.id)}
+                      >
+                        <Star size={16} className="mr-1" />
+                        Avaliar
+                      </Button>
+                    )}
+                    {order.hasRating && (
+                      <span className="flex items-center gap-1 text-sm text-yellow-600">
+                        <Star size={14} className="fill-yellow-400 text-yellow-400" />
+                        Avaliado
+                      </span>
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -288,6 +319,21 @@ const Orders = () => {
           </section>
         )}
       </div>
+
+      {/* Rating Modal */}
+      <AnimatePresence>
+        {ratingOrderId && user && (
+          <OrderRating
+            orderId={ratingOrderId}
+            userId={user.id}
+            onClose={() => setRatingOrderId(null)}
+            onSuccess={() => {
+              setRatingOrderId(null);
+              fetchOrders();
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       <BottomNav />
     </div>
