@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus, Check } from 'lucide-react';
+import { X, Minus, Plus, Check, ChevronDown } from 'lucide-react';
 import { Pizza, sizes, crusts, extras } from '@/data/menuData';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/hooks/useAuth';
+import { useMenuItems } from '@/hooks/useMenuItems';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 // Import pizza images
 import pizzaMargherita from '@/assets/pizza-margherita.jpg';
 import pizzaCalabresa from '@/assets/pizza-calabresa.jpg';
@@ -37,15 +45,25 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
   const navigate = useNavigate();
   const { addItem } = useCart();
   const { user } = useAuth();
+  const { pizzas: availablePizzas } = useMenuItems();
   const [selectedSize, setSelectedSize] = useState('small');
   const [selectedCrust, setSelectedCrust] = useState('tradicional');
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState('');
+  const [wantsTwoFlavors, setWantsTwoFlavors] = useState(false);
+  const [secondFlavor, setSecondFlavor] = useState<string>('');
 
   const image = pizzaImages[pizza.id] || pizzaMargherita;
   
-  const basePrice = pizza.prices[selectedSize as keyof typeof pizza.prices];
+  // Calculate base price - for 2 flavors, use the higher price of the two
+  const firstPizzaPrice = pizza.prices[selectedSize as keyof typeof pizza.prices];
+  const secondPizza = availablePizzas.find(p => p.id === secondFlavor);
+  const secondPizzaPrice = secondPizza?.prices[selectedSize as keyof typeof pizza.prices] || 0;
+  const basePrice = wantsTwoFlavors && secondFlavor 
+    ? Math.max(firstPizzaPrice, secondPizzaPrice)
+    : firstPizzaPrice;
+  
   const crustPrice = crusts.find(c => c.id === selectedCrust)?.price || 0;
   const extrasPrice = selectedExtras.reduce((acc, extraId) => {
     const extra = extras.find(e => e.id === extraId);
@@ -54,18 +72,37 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
   
   const totalPrice = (basePrice + crustPrice + extrasPrice) * quantity;
 
+  // Filter available pizzas for second flavor (exclude current pizza and match category for sweet pizzas)
+  const availableSecondFlavors = availablePizzas.filter(p => {
+    if (p.id === pizza.id) return false;
+    // Sweet pizzas can only be combined with other sweet pizzas
+    if (pizza.category === 'doce') return p.category === 'doce';
+    // Non-sweet pizzas can only be combined with non-sweet
+    return p.category !== 'doce';
+  });
+
   const handleAddToCart = () => {
     if (!user) {
       onClose();
       navigate('/auth');
       return;
     }
+
+    const flavors = [pizza.name];
+    if (wantsTwoFlavors && secondFlavor) {
+      const secondPizzaName = availablePizzas.find(p => p.id === secondFlavor)?.name;
+      if (secondPizzaName) {
+        flavors.push(secondPizzaName);
+      }
+    }
     
     addItem({
       id: '',
-      name: pizza.name,
+      name: wantsTwoFlavors && secondFlavor 
+        ? `${pizza.name} / ${availablePizzas.find(p => p.id === secondFlavor)?.name}`
+        : pizza.name,
       size: sizes.find(s => s.id === selectedSize)?.name || '',
-      flavors: [pizza.name],
+      flavors,
       crust: crusts.find(c => c.id === selectedCrust)?.name || '',
       extras: selectedExtras.map(e => extras.find(ex => ex.id === e)?.name || ''),
       price: basePrice + crustPrice + extrasPrice,
@@ -82,6 +119,13 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
         ? prev.filter(e => e !== extraId)
         : [...prev, extraId]
     );
+  };
+
+  const handleTwoFlavorsToggle = () => {
+    setWantsTwoFlavors(prev => !prev);
+    if (wantsTwoFlavors) {
+      setSecondFlavor('');
+    }
   };
 
   return (
@@ -125,8 +169,81 @@ const PizzaCustomizer = ({ pizza, isOpen, onClose }: PizzaCustomizerProps) => {
                 alt={pizza.name}
                 className="w-full h-full object-cover"
               />
-            </div>
-            
+              </div>
+
+              {/* Two Flavors Option */}
+              <div className="mb-4 sm:mb-6">
+                <h3 className="font-display font-semibold text-sm sm:text-base text-foreground mb-2 sm:mb-3">
+                  🍕 Sabores
+                </h3>
+                
+                {/* Toggle for 2 flavors */}
+                <button
+                  onClick={handleTwoFlavorsToggle}
+                  className={`
+                    w-full flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl 
+                    border-2 transition-all active:scale-[0.98] mb-3
+                    ${wantsTwoFlavors 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-border bg-card hover:border-primary/50'
+                    }
+                  `}
+                >
+                  <div className="text-left">
+                    <p className="font-bold text-sm sm:text-base text-foreground">
+                      Quero 2 sabores (meio a meio)
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">
+                      O valor será do sabor mais caro
+                    </p>
+                  </div>
+                  <div className={`
+                    w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all
+                    ${wantsTwoFlavors 
+                      ? 'gradient-hero border-transparent' 
+                      : 'border-border'
+                    }
+                  `}>
+                    {wantsTwoFlavors && <Check size={12} className="sm:w-3.5 sm:h-3.5 text-primary-foreground" />}
+                  </div>
+                </button>
+
+                {/* First flavor display */}
+                <div className="p-3 sm:p-4 rounded-xl bg-secondary/50 mb-2">
+                  <p className="text-xs text-muted-foreground mb-1">1º Sabor</p>
+                  <p className="font-bold text-foreground">{pizza.name}</p>
+                </div>
+
+                {/* Second flavor selection */}
+                {wantsTwoFlavors && (
+                  <div className="p-3 sm:p-4 rounded-xl border-2 border-dashed border-primary/50 bg-primary/5">
+                    <p className="text-xs text-muted-foreground mb-2">2º Sabor</p>
+                    <Select value={secondFlavor} onValueChange={setSecondFlavor}>
+                      <SelectTrigger className="w-full bg-background border-border">
+                        <SelectValue placeholder="Escolha o segundo sabor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableSecondFlavors.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            <div className="flex items-center justify-between w-full gap-4">
+                              <span>{p.name}</span>
+                              <span className="text-xs text-muted-foreground">
+                                R$ {p.prices[selectedSize as keyof typeof p.prices].toFixed(2)}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {secondFlavor && (
+                      <p className="text-xs text-primary mt-2 font-medium">
+                        ✓ {availablePizzas.find(p => p.id === secondFlavor)?.name}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
             {/* Content */}
             <div className="p-3 sm:p-4 pb-28 sm:pb-32">
               <h2 className="font-display font-bold text-xl sm:text-2xl text-foreground mb-1 sm:mb-2">
