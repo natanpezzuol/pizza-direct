@@ -45,6 +45,11 @@ export interface Order {
   notes: string | null;
   created_at: string;
   updated_at: string;
+  rating?: {
+    rating: number;
+    comment: string | null;
+    created_at: string;
+  };
 }
 
 export const useAdmin = () => {
@@ -196,19 +201,32 @@ export const useAdmin = () => {
     if (!isAdmin) return;
 
     try {
-      const { data, error } = await supabase
+      // Fetch orders
+      const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      if (data) {
-        setOrders(data.map(order => ({
+      if (ordersError) throw ordersError;
+
+      // Fetch all ratings
+      const { data: ratingsData } = await supabase
+        .from('order_ratings')
+        .select('order_id, rating, comment, created_at');
+
+      // Create a map of order_id to rating
+      const ratingsMap = new Map(
+        ratingsData?.map(r => [r.order_id, { rating: r.rating, comment: r.comment, created_at: r.created_at }]) || []
+      );
+
+      if (ordersData) {
+        setOrders(ordersData.map(order => ({
           ...order,
           subtotal: Number(order.subtotal),
           delivery_fee: Number(order.delivery_fee),
           total: Number(order.total),
           items: order.items as any[],
+          rating: ratingsMap.get(order.id),
         })));
       }
     } catch (error) {
