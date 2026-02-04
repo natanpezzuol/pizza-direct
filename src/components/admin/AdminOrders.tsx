@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const statusOptions = [
+  { value: 'received', label: 'Recebido', color: 'bg-yellow-500', textColor: 'text-yellow-600' },
   { value: 'pending', label: 'Pendente', color: 'bg-yellow-500', textColor: 'text-yellow-600' },
   { value: 'confirmed', label: 'Confirmado', color: 'bg-blue-500', textColor: 'text-blue-600' },
   { value: 'preparing', label: 'Em Preparo', color: 'bg-orange-500', textColor: 'text-orange-600' },
@@ -17,6 +18,13 @@ const statusOptions = [
   { value: 'delivered', label: 'Entregue', color: 'bg-green-500', textColor: 'text-green-600' },
   { value: 'cancelled', label: 'Cancelado', color: 'bg-red-500', textColor: 'text-red-600' },
 ];
+
+const paymentMethodLabels: Record<string, string> = {
+  credit_online: 'Cartão de Crédito Online',
+  card_delivery: 'Cartão na Entrega',
+  pix: 'PIX',
+  cash: 'Dinheiro',
+};
 
 type FilterStatus = 'all' | 'pending' | 'active' | 'completed';
 
@@ -64,7 +72,7 @@ const AdminOrders = () => {
   const filteredOrders = orders.filter(order => {
     switch (filterStatus) {
       case 'pending':
-        return order.status === 'pending';
+        return order.status === 'pending' || order.status === 'received';
       case 'active':
         return ['confirmed', 'preparing', 'delivering'].includes(order.status);
       case 'completed':
@@ -74,7 +82,7 @@ const AdminOrders = () => {
     }
   });
 
-  const pendingCount = orders.filter(o => o.status === 'pending').length;
+  const pendingCount = orders.filter(o => o.status === 'pending' || o.status === 'received').length;
   const activeCount = orders.filter(o => ['confirmed', 'preparing', 'delivering'].includes(o.status)).length;
 
   return (
@@ -162,7 +170,7 @@ const AdminOrders = () => {
       <div className="space-y-4">
         {filteredOrders.map(order => {
           const statusInfo = getStatusInfo(order.status);
-          const isPending = order.status === 'pending';
+          const isPending = order.status === 'pending' || order.status === 'received';
           const isPreparing = order.status === 'preparing';
           const isDelivering = order.status === 'delivering';
 
@@ -273,7 +281,7 @@ const AdminOrders = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <CreditCard className="h-4 w-4 text-muted-foreground" />
-                    <span className="capitalize">{order.payment_method}</span>
+                    <span>{paymentMethodLabels[order.payment_method] || order.payment_method}</span>
                   </div>
                 </div>
 
