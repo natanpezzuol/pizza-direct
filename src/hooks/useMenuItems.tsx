@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { pizzas as fallbackPizzas, Pizza } from '@/data/menuData';
+import { pizzas as fallbackPizzas, Pizza, categories as fallbackCategories, Category } from '@/data/menuData';
 
 export interface MenuItem {
   id: string;
@@ -17,6 +17,14 @@ export interface MenuItem {
   popular?: boolean;
   available: boolean;
 }
+
+// Map category IDs to display names and icons
+const categoryDisplayMap: Record<string, { name: string; icon: string }> = {
+  'tradicional': { name: 'Tradicionais', icon: '🧀' },
+  'especial': { name: 'Especiais', icon: '⭐' },
+  'premium': { name: 'Premium', icon: '👑' },
+  'doce': { name: 'Doces', icon: '🍫' },
+};
 
 export const useMenuItems = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -109,9 +117,39 @@ export const useMenuItems = () => {
     popular: item.popular,
   }));
 
+  // Generate dynamic categories based on menu items
+  const categories: Category[] = useMemo(() => {
+    if (menuItems.length === 0) {
+      return fallbackCategories;
+    }
+
+    // Get unique categories from menu items
+    const uniqueCategories = [...new Set(menuItems.map(item => item.category))];
+    
+    // Build categories array with "all" first
+    const dynamicCategories: Category[] = [
+      { id: 'all', name: 'Todas', icon: '🍕' },
+    ];
+
+    uniqueCategories.forEach(categoryId => {
+      const display = categoryDisplayMap[categoryId] || { 
+        name: categoryId.charAt(0).toUpperCase() + categoryId.slice(1), 
+        icon: '🍕' 
+      };
+      dynamicCategories.push({
+        id: categoryId,
+        name: display.name,
+        icon: display.icon,
+      });
+    });
+
+    return dynamicCategories;
+  }, [menuItems]);
+
   return {
     menuItems,
     pizzas,
+    categories,
     loading,
     error,
     refetch: fetchMenuItems,
